@@ -2,114 +2,109 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowDown } from "lucide-react";
 
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
-    <section ref={ref} id="hero" className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-      {/* Background with parallax */}
-      <motion.div
-        style={{ y }}
-        className="absolute inset-0 z-0"
-      >
+    <section
+      ref={ref}
+      id="hero"
+      className="relative min-h-screen flex items-end pb-20 lg:pb-28 overflow-hidden bg-paper-200"
+    >
+      {/* Full-bleed background image */}
+      <motion.div style={{ y: imgY }} className="absolute inset-0 z-0">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-110"
+          className="absolute inset-0 bg-cover bg-center scale-110"
           style={{
             backgroundImage: `url('https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?w=1920&q=85')`,
           }}
         />
-        {/* Multi-layer overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-ink-950/80 via-ink-950/50 to-ink-950/90" />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950/60 via-transparent to-ink-950/60" />
+        {/* Light-mode overlay: paper tone bleed from bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-paper-200 via-paper-200/60 to-paper-200/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-paper-200/50 via-transparent to-paper-200/30" />
       </motion.div>
 
       {/* Content */}
       <motion.div
-        style={{ opacity }}
-        className="relative z-10 text-center px-6 max-w-5xl mx-auto"
+        style={{ y: textY, opacity }}
+        className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-16"
       >
-        {/* Eyebrow */}
-        <motion.p
-          initial={{ opacity: 0, letterSpacing: "0.3em" }}
-          animate={{ opacity: 1, letterSpacing: "0.5em" }}
-          transition={{ duration: 1.2, delay: 0.3 }}
-          className="text-gold text-[10px] lg:text-xs uppercase font-light tracking-[0.5em] mb-8"
-        >
-          Arte Autoral · São Paulo
-        </motion.p>
+        <div className="max-w-3xl">
+          {/* Eyebrow */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="label-section mb-6"
+          >
+            Arte Autoral · Santa Catarina
+          </motion.p>
 
-        {/* Main heading */}
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="font-serif text-5xl sm:text-6xl lg:text-8xl xl:text-9xl font-light text-ink-100 leading-[0.95] tracking-tight mb-6"
-        >
-          A Arte na Pele,
-          <br />
-          <em className="text-gradient-gold not-italic">Elevada</em>
-        </motion.h1>
+          {/* Title — editorial, large, serif */}
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="font-serif font-light leading-[0.9] tracking-tight text-ink"
+            style={{ fontSize: "clamp(3.5rem, 9vw, 8rem)" }}
+          >
+            A Arte
+            <br />
+            <em className="not-italic text-ink-muted">na Pele,</em>
+            <br />
+            Elevada.
+          </motion.h1>
 
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-ink-400 text-sm lg:text-base font-light tracking-wide max-w-md mx-auto mb-12 leading-relaxed"
-        >
-          Tatuagens exclusivas concebidas como obras permanentes.<br />
-          Cada traço, uma assinatura.
-        </motion.p>
+          {/* Thin divider */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
+            className="origin-left w-20 h-px bg-ink-muted mt-8 mb-8"
+          />
 
-        {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
-          <a href="#simulador" className="btn-primary">
-            Testar Simulador Virtual
-          </a>
-          <a href="#portfolio" className="btn-outline">
-            Ver Portfólio
-          </a>
-        </motion.div>
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.1 }}
+            className="text-ink-muted text-sm font-light leading-relaxed max-w-sm mb-10"
+          >
+            Tatuagens neo-geométricas e clássicas
+            concebidas como obras permanentes.
+            Cada composição, uma assinatura.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 1.2 }}
+            className="flex flex-wrap gap-3"
+          >
+            <a href="#simulador" className="btn-primary">
+              Testar Simulador Virtual
+            </a>
+            <a href="#portfolio" className="btn-outline">
+              Ver Portfólio
+            </a>
+          </motion.div>
+        </div>
       </motion.div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
-      >
-        <motion.div
-          animate={{ y: [0, 6, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-        >
-          <ArrowDown size={16} className="text-ink-500" />
-        </motion.div>
-        <span className="text-[9px] tracking-[0.4em] text-ink-600 uppercase">Rolar</span>
-      </motion.div>
-
-      {/* Side text decorations */}
-      <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex flex-col items-center gap-4 z-10">
-        <div className="w-px h-16 bg-gradient-to-b from-transparent to-ink-700" />
+      {/* Right side — vertical label */}
+      <div className="absolute right-6 top-1/2 -translate-y-1/2 hidden lg:flex flex-col items-center gap-3 z-10">
+        <div className="w-px h-12 bg-paper-400" />
         <p
-          className="text-ink-600 text-[9px] tracking-[0.4em] uppercase"
-          style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
+          className="text-ink-faint text-[8px] tracking-[0.4em] uppercase"
+          style={{ writingMode: "vertical-rl" }}
         >
-          Scroll
+          @bruno.belt
         </p>
       </div>
     </section>

@@ -2,226 +2,148 @@
 
 import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, RotateCcw, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, ArrowRight, X } from "lucide-react";
+import {
+  Upload, RotateCcw, ZoomIn, ZoomOut,
+  ChevronLeft, ChevronRight, ArrowRight, X,
+} from "lucide-react";
 import { flashItems } from "@/lib/data";
 
-interface TattooTransform {
-  x: number;
-  y: number;
-  scale: number;
-  rotation: number;
-}
-
-const INITIAL_TRANSFORM: TattooTransform = { x: 0, y: 0, scale: 1, rotation: 0 };
+interface TattooTransform { x: number; y: number; scale: number; rotation: number }
+const INITIAL: TattooTransform = { x: 0, y: 0, scale: 1, rotation: 0 };
 
 export default function Simulator() {
-  const [selectedFlash, setSelectedFlash] = useState<(typeof flashItems)[0] | null>(null);
-  const [bodyPhoto, setBodyPhoto] = useState<string | null>(null);
-  const [transform, setTransform] = useState<TattooTransform>(INITIAL_TRANSFORM);
-  const [isDragging, setIsDragging] = useState(false);
+  const [selected, setSelected] = useState<(typeof flashItems)[0] | null>(null);
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [xf, setXf] = useState<TattooTransform>(INITIAL);
+  const [dragging, setDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [flashPage, setFlashPage] = useState(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const [page, setPage] = useState(0);
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  const flashesPerPage = 3;
-  const totalPages = Math.ceil(flashItems.length / flashesPerPage);
-  const visibleFlashes = flashItems.slice(
-    flashPage * flashesPerPage,
-    flashPage * flashesPerPage + flashesPerPage
-  );
+  const perPage = 3;
+  const totalPages = Math.ceil(flashItems.length / perPage);
+  const visible = flashItems.slice(page * perPage, page * perPage + perPage);
 
-  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const onUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      setBodyPhoto(ev.target?.result as string);
-      setStep(3);
-    };
+    reader.onload = (ev) => { setPhoto(ev.target?.result as string); setStep(3); };
     reader.readAsDataURL(file);
   }, []);
 
-  const handleSelectFlash = (flash: (typeof flashItems)[0]) => {
-    setSelectedFlash(flash);
-    setTransform(INITIAL_TRANSFORM);
-    if (bodyPhoto) {
-      setStep(3);
-    } else {
-      setStep(2);
-    }
+  const onSelect = (f: (typeof flashItems)[0]) => {
+    setSelected(f); setXf(INITIAL);
+    setStep(photo ? 3 : 2);
   };
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - transform.x, y: e.clientY - transform.y });
-    },
-    [transform.x, transform.y]
-  );
+  const onMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault(); setDragging(true);
+    setDragStart({ x: e.clientX - xf.x, y: e.clientY - xf.y });
+  }, [xf.x, xf.y]);
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (!isDragging) return;
-      setTransform((prev) => ({
-        ...prev,
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      }));
-    },
-    [isDragging, dragStart]
-  );
+  const onMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!dragging) return;
+    setXf(p => ({ ...p, x: e.clientX - dragStart.x, y: e.clientY - dragStart.y }));
+  }, [dragging, dragStart]);
 
-  const handleMouseUp = useCallback(() => setIsDragging(false), []);
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0]; setDragging(true);
+    setDragStart({ x: t.clientX - xf.x, y: t.clientY - xf.y });
+  }, [xf.x, xf.y]);
 
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      const touch = e.touches[0];
-      setIsDragging(true);
-      setDragStart({ x: touch.clientX - transform.x, y: touch.clientY - transform.y });
-    },
-    [transform.x, transform.y]
-  );
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!dragging) return;
+    const t = e.touches[0];
+    setXf(p => ({ ...p, x: t.clientX - dragStart.x, y: t.clientY - dragStart.y }));
+  }, [dragging, dragStart]);
 
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (!isDragging) return;
-      const touch = e.touches[0];
-      setTransform((prev) => ({
-        ...prev,
-        x: touch.clientX - dragStart.x,
-        y: touch.clientY - dragStart.y,
-      }));
-    },
-    [isDragging, dragStart]
-  );
-
-  const handleWheel = useCallback((e: React.WheelEvent) => {
+  const onWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
-    setTransform((prev) => ({
-      ...prev,
-      scale: Math.min(3, Math.max(0.3, prev.scale - e.deltaY * 0.001)),
-    }));
+    setXf(p => ({ ...p, scale: Math.min(3, Math.max(0.3, p.scale - e.deltaY * 0.001)) }));
   }, []);
 
-  const adjustScale = (delta: number) => {
-    setTransform((prev) => ({
-      ...prev,
-      scale: Math.min(3, Math.max(0.3, prev.scale + delta)),
-    }));
-  };
-
-  const adjustRotation = (delta: number) => {
-    setTransform((prev) => ({ ...prev, rotation: prev.rotation + delta }));
-  };
-
   return (
-    <section id="simulador" className="py-24 lg:py-32 bg-ink-900">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <section id="simulador" className="py-24 lg:py-36 bg-paper-100">
+      <div className="max-w-7xl mx-auto px-6 lg:px-16">
+
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8 }}
-          className="mb-16"
+          className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14"
         >
-          <p className="text-gold text-[10px] tracking-[0.5em] uppercase font-light mb-4">
-            02 — Simulador
+          <div>
+            <p className="label-section mb-4">02 — Simulador Virtual</p>
+            <h2
+              className="font-serif font-light leading-[0.95] tracking-tight text-ink"
+              style={{ fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
+            >
+              Veja na
+              <br />
+              Sua Pele
+            </h2>
+          </div>
+          <p className="text-ink-muted text-sm font-light leading-relaxed max-w-xs">
+            Escolha um flash, envie uma foto e posicione a tatuagem. Tudo no browser, sem upload para servidores.
           </p>
-          <h2 className="font-serif text-4xl lg:text-6xl font-light text-ink-100 leading-tight">
-            Veja na Sua Pele
-          </h2>
-          <p className="mt-4 text-ink-400 text-sm leading-relaxed max-w-lg">
-            Escolha um flash autoral, envie uma foto do corpo e visualize como ficaria
-            antes de marcar a sessão.
-          </p>
-          <div className="mt-6 w-16 h-px bg-gold" />
         </motion.div>
 
-        {/* Steps indicator */}
-        <div className="flex items-center gap-3 mb-12">
-          {[
-            { n: 1, label: "Escolher flash" },
-            { n: 2, label: "Enviar foto" },
-            { n: 3, label: "Ajustar" },
-          ].map(({ n, label }) => (
-            <div key={n} className="flex items-center gap-3">
-              <div
-                className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium transition-all duration-300 ${
-                  step >= n
-                    ? "bg-gold text-ink-950"
-                    : "bg-ink-800 text-ink-600 border border-ink-700"
-                }`}
-              >
-                {n}
-              </div>
-              <span
-                className={`text-xs tracking-wide hidden sm:block transition-colors duration-300 ${
-                  step >= n ? "text-ink-300" : "text-ink-600"
-                }`}
-              >
-                {label}
-              </span>
-              {n < 3 && (
-                <div
-                  className={`w-8 h-px transition-all duration-300 ${
-                    step > n ? "bg-gold" : "bg-ink-700"
-                  }`}
-                />
-              )}
+        {/* Steps */}
+        <div className="flex items-center gap-2 mb-12">
+          {[{ n: 1, l: "Flash" }, { n: 2, l: "Foto" }, { n: 3, l: "Ajustar" }].map(({ n, l }) => (
+            <div key={n} className="flex items-center gap-2">
+              <div className={`flex items-center justify-center w-6 h-6 text-[10px] font-medium border transition-all duration-300 ${
+                step >= n ? "bg-ink border-ink text-paper-100" : "border-paper-400 text-ink-faint"
+              }`}>{n}</div>
+              <span className={`text-[10px] tracking-widest uppercase hidden sm:block transition-colors duration-300 ${
+                step >= n ? "text-ink" : "text-paper-400"
+              }`}>{l}</span>
+              {n < 3 && <div className={`w-6 h-px mx-1 transition-all duration-300 ${step > n ? "bg-ink" : "bg-paper-300"}`} />}
             </div>
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-[320px_1fr] gap-8 lg:gap-12">
-          {/* Left panel: Flash selector */}
-          <div className="space-y-6">
-            <h3 className="text-xs tracking-widest uppercase text-ink-400">Flash Disponíveis</h3>
+        <div className="grid lg:grid-cols-[300px_1fr] gap-8 lg:gap-12">
+
+          {/* Left panel */}
+          <div className="space-y-5">
+            <p className="text-[9px] tracking-widest uppercase text-ink-faint">Flashes Disponíveis</p>
 
             <AnimatePresence mode="wait">
               <motion.div
-                key={flashPage}
-                initial={{ opacity: 0, x: 10 }}
+                key={page}
+                initial={{ opacity: 0, x: 8 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.25 }}
-                className="grid grid-cols-3 lg:grid-cols-1 gap-3"
+                exit={{ opacity: 0, x: -8 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-2"
               >
-                {visibleFlashes.map((flash) => (
+                {visible.map((f) => (
                   <motion.button
-                    key={flash.id}
-                    onClick={() => handleSelectFlash(flash)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`relative group flex lg:flex-row flex-col items-center lg:gap-4 p-3 lg:p-4 border transition-all duration-300 text-left ${
-                      selectedFlash?.id === flash.id
-                        ? "border-gold bg-gold/5"
-                        : "border-ink-800 bg-ink-950 hover:border-ink-600"
+                    key={f.id}
+                    onClick={() => onSelect(f)}
+                    whileTap={{ scale: 0.99 }}
+                    className={`w-full flex items-center gap-4 p-3 border text-left transition-all duration-200 ${
+                      selected?.id === f.id
+                        ? "border-ink bg-ink/5"
+                        : "border-paper-300 bg-paper-50 hover:border-paper-500"
                     }`}
                   >
-                    {/* Flash preview — SVG on dark bg */}
-                    <div className="w-14 h-14 lg:w-16 lg:h-16 flex-shrink-0 bg-zinc-100 rounded-sm overflow-hidden flex items-center justify-center">
-                      <img
-                        src={flash.src}
-                        alt={flash.name}
-                        className="w-full h-full object-contain"
-                        draggable={false}
-                      />
+                    {/* SVG thumbnail — white bg so the ink shows */}
+                    <div className="w-14 h-14 flex-shrink-0 bg-white border border-paper-200 flex items-center justify-center overflow-hidden">
+                      <img src={f.src} alt={f.name} className="w-12 h-12 object-contain" draggable={false} />
                     </div>
-                    <div className="hidden lg:block flex-1 min-w-0">
-                      <p className="text-sm text-ink-200 font-light">{flash.name}</p>
-                      <p className="text-[10px] tracking-wider text-ink-500 uppercase mt-0.5 mb-1">
-                        {flash.style}
-                      </p>
-                      <p className="text-[10px] text-ink-600 leading-relaxed line-clamp-2">
-                        {flash.description}
-                      </p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-ink font-light">{f.name}</p>
+                      <p className="text-[9px] tracking-widest text-ink-faint uppercase mt-0.5">{f.style}</p>
+                      <p className="text-[10px] text-ink-muted leading-relaxed mt-1 line-clamp-2">{f.description}</p>
                     </div>
-                    {selectedFlash?.id === flash.id && (
-                      <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-gold" />
+                    {selected?.id === f.id && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-ink flex-shrink-0" />
                     )}
                   </motion.button>
                 ))}
@@ -231,243 +153,155 @@ export default function Simulator() {
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setFlashPage((p) => Math.max(0, p - 1))}
-                  disabled={flashPage === 0}
-                  className="p-1.5 border border-ink-700 text-ink-500 hover:text-gold hover:border-gold disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronLeft size={14} />
+                <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
+                  className="p-1.5 border border-paper-300 text-ink-muted hover:border-ink hover:text-ink disabled:opacity-30 transition-colors">
+                  <ChevronLeft size={13} />
                 </button>
-                <span className="text-[10px] text-ink-600">
-                  {flashPage + 1} / {totalPages}
-                </span>
-                <button
-                  onClick={() => setFlashPage((p) => Math.min(totalPages - 1, p + 1))}
-                  disabled={flashPage === totalPages - 1}
-                  className="p-1.5 border border-ink-700 text-ink-500 hover:text-gold hover:border-gold disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight size={14} />
+                <span className="text-[10px] text-ink-faint">{page + 1}/{totalPages}</span>
+                <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page === totalPages - 1}
+                  className="p-1.5 border border-paper-300 text-ink-muted hover:border-ink hover:text-ink disabled:opacity-30 transition-colors">
+                  <ChevronRight size={13} />
                 </button>
               </div>
             )}
 
-            {/* Upload button */}
-            <div>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full flex items-center justify-center gap-3 py-4 border border-dashed border-ink-700 text-ink-500 hover:border-gold hover:text-gold transition-all duration-300 text-xs tracking-widest uppercase"
-              >
-                <Upload size={14} />
-                {bodyPhoto ? "Trocar foto do corpo" : "Enviar foto do corpo"}
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileUpload}
-              />
-              <p className="mt-2 text-[10px] text-ink-600 leading-relaxed">
-                Sua foto não é enviada a nenhum servidor. Todo o processamento é local.
-              </p>
-            </div>
+            {/* Upload */}
+            <button onClick={() => fileRef.current?.click()}
+              className="w-full flex items-center justify-center gap-2 py-3.5 border border-dashed border-paper-400 text-ink-muted hover:border-ink hover:text-ink transition-all duration-300 text-[10px] tracking-widest uppercase">
+              <Upload size={13} />
+              {photo ? "Trocar foto" : "Enviar foto do corpo"}
+            </button>
+            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onUpload} />
+            <p className="text-[9px] text-ink-faint leading-relaxed">
+              Sua foto não sai do navegador. Processamento 100% local.
+            </p>
 
             {/* Controls */}
-            {selectedFlash && bodyPhoto && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-4 pt-4 border-t border-ink-800"
-              >
-                <h4 className="text-[10px] tracking-widest uppercase text-ink-500">Ajustes</h4>
+            {selected && photo && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                className="space-y-4 pt-5 border-t border-paper-300">
+                <p className="text-[9px] tracking-widest uppercase text-ink-faint">Ajustes</p>
 
-                {/* Scale */}
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] text-ink-600 w-16">Tamanho</span>
-                  <button
-                    onClick={() => adjustScale(-0.1)}
-                    className="p-1.5 border border-ink-700 hover:border-gold hover:text-gold text-ink-500 transition-colors"
-                  >
-                    <ZoomOut size={12} />
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] text-ink-faint w-14">Tamanho</span>
+                  <button onClick={() => setXf(p => ({ ...p, scale: Math.max(0.3, p.scale - 0.1) }))}
+                    className="p-1.5 border border-paper-300 hover:border-ink text-ink-muted hover:text-ink transition-colors">
+                    <ZoomOut size={11} />
                   </button>
-                  <div className="flex-1 h-px bg-ink-800 relative">
-                    <div
-                      className="absolute top-1/2 -translate-y-1/2 w-2 h-2 bg-gold rounded-full"
-                      style={{ left: `${((transform.scale - 0.3) / 2.7) * 100}%` }}
-                    />
+                  <div className="flex-1 h-px bg-paper-300 relative">
+                    <div className="absolute top-1/2 -translate-y-1/2 w-2 h-2 bg-ink rounded-full"
+                      style={{ left: `${((xf.scale - 0.3) / 2.7) * 100}%` }} />
                   </div>
-                  <button
-                    onClick={() => adjustScale(0.1)}
-                    className="p-1.5 border border-ink-700 hover:border-gold hover:text-gold text-ink-500 transition-colors"
-                  >
-                    <ZoomIn size={12} />
+                  <button onClick={() => setXf(p => ({ ...p, scale: Math.min(3, p.scale + 0.1) }))}
+                    className="p-1.5 border border-paper-300 hover:border-ink text-ink-muted hover:text-ink transition-colors">
+                    <ZoomIn size={11} />
                   </button>
                 </div>
 
-                {/* Rotation */}
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] text-ink-600 w-16">Rotação</span>
-                  <button
-                    onClick={() => adjustRotation(-15)}
-                    className="p-1.5 border border-ink-700 hover:border-gold hover:text-gold text-ink-500 transition-colors"
-                  >
-                    <RotateCcw size={12} />
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] text-ink-faint w-14">Rotação</span>
+                  <button onClick={() => setXf(p => ({ ...p, rotation: p.rotation - 15 }))}
+                    className="p-1.5 border border-paper-300 hover:border-ink text-ink-muted hover:text-ink transition-colors">
+                    <RotateCcw size={11} />
                   </button>
-                  <span className="flex-1 text-center text-xs text-ink-500">
-                    {transform.rotation}°
-                  </span>
-                  <button
-                    onClick={() => adjustRotation(15)}
-                    className="p-1.5 border border-ink-700 hover:border-gold hover:text-gold text-ink-500 transition-colors rotate-180"
-                  >
-                    <RotateCcw size={12} />
+                  <span className="flex-1 text-center text-[10px] text-ink-muted">{xf.rotation}°</span>
+                  <button onClick={() => setXf(p => ({ ...p, rotation: p.rotation + 15 }))}
+                    className="p-1.5 border border-paper-300 hover:border-ink text-ink-muted hover:text-ink transition-colors rotate-180">
+                    <RotateCcw size={11} />
                   </button>
                 </div>
 
-                {/* Reset */}
-                <button
-                  onClick={() => setTransform(INITIAL_TRANSFORM)}
-                  className="text-[10px] tracking-widest uppercase text-ink-600 hover:text-gold transition-colors flex items-center gap-1.5"
-                >
-                  <RotateCcw size={10} />
-                  Resetar posição
+                <button onClick={() => setXf(INITIAL)}
+                  className="text-[9px] tracking-widest uppercase text-ink-faint hover:text-ink transition-colors flex items-center gap-1.5">
+                  <RotateCcw size={9} /> Resetar
                 </button>
               </motion.div>
             )}
           </div>
 
-          {/* Right panel: Canvas */}
-          <div className="space-y-4">
+          {/* Canvas */}
+          <div className="space-y-3">
             <div
-              ref={canvasRef}
-              className="relative bg-ink-950 border border-ink-800 overflow-hidden select-none"
+              className="relative bg-paper-50 border border-paper-300 overflow-hidden select-none"
               style={{ aspectRatio: "4/3", minHeight: "360px" }}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleMouseUp}
-              onWheel={handleWheel}
+              onMouseMove={onMouseMove}
+              onMouseUp={() => setDragging(false)}
+              onMouseLeave={() => setDragging(false)}
+              onTouchMove={onTouchMove}
+              onTouchEnd={() => setDragging(false)}
+              onWheel={onWheel}
             >
-              {/* Background photo */}
-              {bodyPhoto ? (
-                <img
-                  src={bodyPhoto}
-                  alt="Foto do corpo"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  draggable={false}
-                />
+              {/* Body photo */}
+              {photo ? (
+                <img src={photo} alt="corpo" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
               ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                  <div className="w-16 h-px bg-ink-800" />
-                  <p className="text-ink-600 text-xs tracking-widest uppercase text-center px-4">
-                    {selectedFlash
-                      ? "Envie uma foto do corpo para continuar"
-                      : "Selecione um flash para começar"}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                  <div className="w-10 h-px bg-paper-300" />
+                  <p className="text-ink-faint text-[10px] tracking-widest uppercase text-center px-8">
+                    {selected ? "Envie uma foto do corpo" : "Selecione um flash para começar"}
                   </p>
-                  <div className="w-16 h-px bg-ink-800" />
-                  {selectedFlash && (
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="mt-4 btn-outline text-[10px] py-3 px-6 flex items-center gap-2"
-                    >
-                      <Upload size={12} />
-                      Enviar foto
+                  <div className="w-10 h-px bg-paper-300" />
+                  {selected && (
+                    <button onClick={() => fileRef.current?.click()}
+                      className="mt-3 btn-outline text-[9px] py-2.5 px-5 flex items-center gap-2">
+                      <Upload size={11} /> Enviar foto
                     </button>
                   )}
                 </div>
               )}
 
-              {/* Subtle skin-tone warmth overlay — doesn't interfere with multiply blend */}
-              {bodyPhoto && (
-                <div className="absolute inset-0 bg-amber-900/5 pointer-events-none" />
-              )}
-
               {/* Tattoo overlay */}
               <AnimatePresence>
-                {selectedFlash && bodyPhoto && (
+                {selected && photo && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className={`absolute z-10 ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+                    exit={{ opacity: 0 }}
+                    className={`absolute z-10 ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
                     style={{
-                      left: "50%",
-                      top: "50%",
-                      transform: `translate(calc(-50% + ${transform.x}px), calc(-50% + ${transform.y}px)) scale(${transform.scale}) rotate(${transform.rotation}deg)`,
+                      left: "50%", top: "50%",
+                      transform: `translate(calc(-50% + ${xf.x}px), calc(-50% + ${xf.y}px)) scale(${xf.scale}) rotate(${xf.rotation}deg)`,
                       touchAction: "none",
                     }}
-                    onMouseDown={handleMouseDown}
-                    onTouchStart={handleTouchStart}
+                    onMouseDown={onMouseDown}
+                    onTouchStart={onTouchStart}
                   >
-                    {/* Flash SVG — mix-blend-mode:multiply makes white bg disappear over body photo */}
                     <img
-                      src={selectedFlash.src}
-                      alt={selectedFlash.name}
+                      src={selected.src}
+                      alt={selected.name}
                       className="select-none pointer-events-none block"
-                      style={{
-                        width: "140px",
-                        height: "auto",
-                        mixBlendMode: "multiply",
-                        filter: "contrast(1.1)",
-                      }}
+                      style={{ width: "140px", height: "auto", mixBlendMode: "multiply", filter: "contrast(1.05)" }}
                       draggable={false}
                     />
-                    {/* Drag hint */}
-                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] text-gold/70 tracking-wider whitespace-nowrap pointer-events-none">
+                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[8px] text-ink-muted tracking-wider whitespace-nowrap pointer-events-none">
                       Arraste para posicionar
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* Clear photo button */}
-              {bodyPhoto && (
-                <button
-                  onClick={() => {
-                    setBodyPhoto(null);
-                    setStep(selectedFlash ? 2 : 1);
-                  }}
-                  className="absolute top-3 right-3 z-20 p-1.5 bg-ink-950/80 border border-ink-700 text-ink-500 hover:text-gold hover:border-gold transition-colors"
-                >
-                  <X size={12} />
+              {/* Clear photo */}
+              {photo && (
+                <button onClick={() => { setPhoto(null); setStep(selected ? 2 : 1); }}
+                  className="absolute top-3 right-3 z-20 p-1.5 bg-paper-50/80 border border-paper-300 text-ink-muted hover:text-ink transition-colors">
+                  <X size={11} />
                 </button>
               )}
             </div>
 
-            {/* Helper text */}
-            <p className="text-[10px] text-ink-600">
-              {selectedFlash && bodyPhoto
-                ? "Use o scroll do mouse para redimensionar · Arraste para posicionar · Use os botões para rotacionar"
-                : ""}
+            <p className="text-[9px] text-ink-faint">
+              {selected && photo ? "Scroll → tamanho · Arraste → posição · Botões → rotação" : ""}
             </p>
 
-            {/* CTA */}
             <AnimatePresence>
-              {selectedFlash && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="pt-4"
-                >
-                  <a
-                    href={`#orcamento?flash=${encodeURIComponent(selectedFlash.name)}`}
-                    onClick={() => {
-                      const el = document.getElementById("flash-selected");
-                      if (el) el.setAttribute("data-value", selectedFlash.name);
-                    }}
-                    data-flash={selectedFlash.name}
-                    className="btn-primary inline-flex items-center gap-3"
-                  >
-                    Quero essa tatuagem
-                    <ArrowRight size={14} />
+              {selected && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                  <a href={`#orcamento?flash=${encodeURIComponent(selected.name)}`}
+                    className="btn-primary inline-flex items-center gap-3">
+                    Quero essa tatuagem <ArrowRight size={13} />
                   </a>
-                  <p className="mt-3 text-[10px] text-ink-600">
-                    Flash selecionado:{" "}
-                    <span className="text-gold">{selectedFlash.name}</span>
-                    {" · "}
-                    {selectedFlash.style}
+                  <p className="mt-2.5 text-[9px] text-ink-faint">
+                    Flash: <span className="text-ink">{selected.name}</span> · {selected.style}
                   </p>
                 </motion.div>
               )}
