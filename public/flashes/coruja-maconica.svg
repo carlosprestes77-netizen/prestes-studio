@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 480" fill="none">
+
+  <!-- Masonic compass and square top right -->
+  <!-- Square (L-shape tool) -->
+  <path d="M168 18 L200 18 L200 50" stroke="#111" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Circle around it -->
+  <circle cx="184" cy="34" r="22" stroke="#111" stroke-width="1" fill="none"/>
+  <!-- Compass legs -->
+  <line x1="178" y1="24" x2="168" y2="50" stroke="#111" stroke-width="1.5"/>
+  <line x1="190" y1="24" x2="200" y2="50" stroke="#111" stroke-width="1.5"/>
+  <line x1="172" y1="44" x2="196" y2="44" stroke="#111" stroke-width="1"/>
+
+  <!-- Small G in center -->
+  <text x="180" y="40" font-family="'Times New Roman', serif" font-size="12" fill="#111" font-weight="700">G</text>
+
+  <!-- Geometric arc lines top-left -->
+  <path d="M40 160 Q65 60 130 30" stroke="#111" stroke-width="0.8" fill="none"/>
+  <path d="M35 175 Q62 70 128 38" stroke="#111" stroke-width="0.5" fill="none"/>
+
+  <!-- Owl body - front facing with wings spread -->
+  <!-- Left wing -->
+  <path d="M140 180 C118 168 92 155 68 142 C55 136 42 134 36 140 C42 148 58 150 72 152 C58 156 46 163 42 172 C50 175 65 170 80 164 C68 172 60 183 62 193 C72 191 83 182 94 172 C86 183 82 196 86 206 C96 200 104 188 110 175 L140 190 Z" fill="#111"/>
+  <!-- Left wing detail -->
+  <path d="M95 155 C80 162 66 170 56 180" stroke="#333" stroke-width="0.8"/>
+  <path d="M98 164 C84 170 70 178 62 188" stroke="#333" stroke-width="0.7"/>
+  <path d="M100 174 C88 180 76 188 68 198" stroke="#333" stroke-width="0.6"/>
+
+  <!-- Right wing -->
+  <path d="M140 180 C162 168 188 155 212 142 C225 136 238 134 244 140 C238 148 222 150 208 152 C222 156 234 163 238 172 C230 175 215 170 200 164 C212 172 220 183 218 193 C208 191 197 182 186 172 C194 183 198 196 194 206 C184 200 176 188 170 175 L140 190 Z" fill="#111"/>
+  <!-- Right wing detail -->
+  <path d="M185 155 C200 162 214 170 224 180" stroke="#333" stroke-width="0.8"/>
+  <path d="M182 164 C196 170 210 178 218 188" stroke="#333" stroke-width="0.7"/>
+  <path d="M180 174 C192 180 204 188 212 198" stroke="#333" stroke-width="0.6"/>
+
+  <!-- Owl body/torso -->
+  <path d="M122 130 C118 148 116 168 118 186 C120 200 130 210 140 212 C150 210 160 200 162 186 C164 168 162 148 158 130 C154 118 148 112 140 112 C132 112 126 118 122 130Z" fill="#111"/>
+
+  <!-- Owl head -->
+  <ellipse cx="140" cy="110" rx="28" ry="26" fill="#111"/>
+
+  <!-- Ear tufts -->
+  <path d="M120 96 C116 86 118 76 122 82 C124 86 122 92 120 96Z" fill="#111"/>
+  <path d="M160 96 C164 86 162 76 158 82 C156 86 158 92 160 96Z" fill="#111"/>
+
+  <!-- Owl face disc (lighter area) -->
+  <ellipse cx="140" cy="112" rx="22" ry="20" fill="#1a1a1a"/>
+
+  <!-- Left eye -->
+  <circle cx="131" cy="108" r="10" fill="#eee"/>
+  <circle cx="131" cy="108" r="7" fill="#333"/>
+  <circle cx="131" cy="108" r="4" fill="#111"/>
+  <circle cx="133" cy="106" r="1.5" fill="#eee"/>
+  <!-- Eye rings -->
+  <circle cx="131" cy="108" r="10" stroke="#111" stroke-width="1.5" fill="none"/>
+  <circle cx="131" cy="108" r="12" stroke="#111" stroke-width="0.8" fill="none"/>
+
+  <!-- Right eye -->
+  <circle cx="149" cy="108" r="10" fill="#eee"/>
+  <circle cx="149" cy="108" r="7" fill="#333"/>
+  <circle cx="149" cy="108" r="4" fill="#111"/>
+  <circle cx="151" cy="106" r="1.5" fill="#eee"/>
+  <circle cx="149" cy="108" r="10" stroke="#111" stroke-width="1.5" fill="none"/>
+  <circle cx="149" cy="108" r="12" stroke="#111" stroke-width="0.8" fill="none"/>
+
+  <!-- Beak -->
+  <path d="M137 116 C138 122 140 125 140 125 C140 125 142 122 143 116 C142 114 138 114 137 116Z" fill="#eee"/>
+
+  <!-- Feather texture on chest -->
+  <path d="M130 148 C134 145 138 146 140 150" stroke="#333" stroke-width="0.8"/>
+  <path d="M128 160 C133 157 137 158 140 162" stroke="#333" stroke-width="0.7"/>
+  <path d="M129 172 C133 169 137 170 140 174" stroke="#333" stroke-width="0.7"/>
+  <path d="M130 184 C134 181 138 182 140 186" stroke="#333" stroke-width="0.6"/>
+
+  <!-- Geometric circles overlapping body -->
+  <circle cx="140" cy="175" r="45" stroke="#111" stroke-width="0.8" fill="none"/>
+  <circle cx="140" cy="175" r="35" stroke="#111" stroke-width="0.4" fill="none"/>
+
+  <!-- Dotwork arc -->
+  <path d="M82 210 Q60 260 70 310" stroke="#111" stroke-width="0.7" stroke-dasharray="1.5,4" fill="none"/>
+  <circle cx="70" cy="312" r="2.5" fill="#111"/>
+
+  <!-- Ionic column below -->
+  <!-- Capital top -->
+  <path d="M105 285 C110 278 120 274 140 274 C160 274 170 278 175 285 Z" fill="#111"/>
+  <rect x="112" y="285" width="56" height="6" fill="#111"/>
+  <!-- Volutes (scrolls) -->
+  <path d="M112 285 C106 281 104 276 108 272 C112 268 118 270 116 276 C115 279 112 280 112 285Z" stroke="#111" stroke-width="1" fill="none"/>
+  <path d="M168 285 C174 281 176 276 172 272 C168 268 162 270 164 276 C165 279 168 280 168 285Z" stroke="#111" stroke-width="1" fill="none"/>
+
+  <!-- Column shaft flutes -->
+  <rect x="122" y="291" width="36" height="120" stroke="#111" stroke-width="1.2" fill="none"/>
+  <line x1="130" y1="291" x2="130" y2="411" stroke="#111" stroke-width="0.5"/>
+  <line x1="136" y1="291" x2="136" y2="411" stroke="#111" stroke-width="0.5"/>
+  <line x1="140" y1="291" x2="140" y2="411" stroke="#111" stroke-width="0.6"/>
+  <line x1="144" y1="291" x2="144" y2="411" stroke="#111" stroke-width="0.5"/>
+  <line x1="150" y1="291" x2="150" y2="411" stroke="#111" stroke-width="0.5"/>
+
+  <!-- Column base/stylobate -->
+  <rect x="112" y="411" width="56" height="10" fill="#111" opacity="0.8"/>
+  <rect x="106" y="421" width="68" height="6" fill="#111" opacity="0.6"/>
+  <rect x="100" y="427" width="80" height="4" fill="#111" opacity="0.4"/>
+
+  <!-- Steps below -->
+  <path d="M95 435 L185 435 L180 445 L100 445 Z" stroke="#111" stroke-width="0.8" fill="none"/>
+
+  <!-- Dotwork right side -->
+  <circle cx="200" cy="175" r="1.5" fill="#111"/>
+  <circle cx="205" cy="190" r="1" fill="#111"/>
+  <circle cx="198" cy="204" r="1.2" fill="#111"/>
+  <circle cx="204" cy="218" r="0.8" fill="#111"/>
+  <circle cx="75" cy="225" r="1.5" fill="#111"/>
+  <circle cx="70" cy="240" r="1" fill="#111"/>
+
+  <!-- Geometric line top left -->
+  <line x1="30" y1="135" x2="80" y2="135" stroke="#111" stroke-width="0.8" stroke-dasharray="4,3"/>
+  <line x1="30" y1="128" x2="70" y2="128" stroke="#111" stroke-width="0.5"/>
+
+</svg>

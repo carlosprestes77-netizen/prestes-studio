@@ -202,9 +202,14 @@ export default function Simulator() {
                         : "border-ink-800 bg-ink-950 hover:border-ink-600"
                     }`}
                   >
-                    {/* Placeholder flash preview */}
-                    <div className="w-14 h-14 lg:w-16 lg:h-16 flex-shrink-0 bg-ink-800 flex items-center justify-center text-2xl lg:text-3xl rounded-sm overflow-hidden">
-                      {flash.placeholder}
+                    {/* Flash preview — SVG on dark bg */}
+                    <div className="w-14 h-14 lg:w-16 lg:h-16 flex-shrink-0 bg-zinc-100 rounded-sm overflow-hidden flex items-center justify-center">
+                      <img
+                        src={flash.src}
+                        alt={flash.name}
+                        className="w-full h-full object-contain"
+                        draggable={false}
+                      />
                     </div>
                     <div className="hidden lg:block flex-1 min-w-0">
                       <p className="text-sm text-ink-200 font-light">{flash.name}</p>
@@ -373,9 +378,9 @@ export default function Simulator() {
                 </div>
               )}
 
-              {/* Overlay for dimming */}
+              {/* Subtle skin-tone warmth overlay — doesn't interfere with multiply blend */}
               {bodyPhoto && (
-                <div className="absolute inset-0 bg-ink-950/20 pointer-events-none" />
+                <div className="absolute inset-0 bg-amber-900/5 pointer-events-none" />
               )}
 
               {/* Tattoo overlay */}
@@ -395,15 +400,21 @@ export default function Simulator() {
                     onMouseDown={handleMouseDown}
                     onTouchStart={handleTouchStart}
                   >
-                    {/* Flash preview — uses emoji as placeholder (replace with real PNG) */}
-                    <div
-                      className="flex items-center justify-center select-none pointer-events-none"
-                      style={{ fontSize: "clamp(60px, 10vw, 100px)", lineHeight: 1 }}
-                    >
-                      {selectedFlash.placeholder}
-                    </div>
+                    {/* Flash SVG — mix-blend-mode:multiply makes white bg disappear over body photo */}
+                    <img
+                      src={selectedFlash.src}
+                      alt={selectedFlash.name}
+                      className="select-none pointer-events-none block"
+                      style={{
+                        width: "140px",
+                        height: "auto",
+                        mixBlendMode: "multiply",
+                        filter: "contrast(1.1)",
+                      }}
+                      draggable={false}
+                    />
                     {/* Drag hint */}
-                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] text-gold/70 tracking-wider whitespace-nowrap">
+                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] text-gold/70 tracking-wider whitespace-nowrap pointer-events-none">
                       Arraste para posicionar
                     </div>
                   </motion.div>

@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 480" fill="none">
+
+  <!-- Eagle at top - dynamic spread wings -->
+  <!-- Left wing -->
+  <path d="M140 90 C118 78 90 62 62 48 C48 42 34 40 28 48 C35 56 52 58 68 60 C54 64 40 72 36 82 C46 85 62 80 78 72 C64 80 56 95 60 106 C70 102 82 92 92 80 C82 92 80 108 85 118 C96 110 104 96 110 82 L140 100 Z" fill="#111"/>
+  <path d="M96 64 C80 72 64 80 52 90" stroke="#333" stroke-width="0.8"/>
+  <path d="M100 74 C84 82 68 90 56 100" stroke="#333" stroke-width="0.7"/>
+  <path d="M102 84 C88 92 74 100 64 110" stroke="#333" stroke-width="0.6"/>
+
+  <!-- Right wing -->
+  <path d="M140 90 C162 78 190 62 218 48 C232 42 246 40 252 48 C245 56 228 58 212 60 C226 64 240 72 244 82 C234 85 218 80 202 72 C216 80 224 95 220 106 C210 102 198 92 188 80 C198 92 200 108 195 118 C184 110 176 96 170 82 L140 100 Z" fill="#111"/>
+  <path d="M184 64 C200 72 216 80 228 90" stroke="#333" stroke-width="0.8"/>
+  <path d="M180 74 C196 82 212 90 224 100" stroke="#333" stroke-width="0.7"/>
+  <path d="M178 84 C192 92 206 100 216 110" stroke="#333" stroke-width="0.6"/>
+
+  <!-- Eagle body/head -->
+  <path d="M128 55 C124 64 122 76 124 88 C126 98 132 106 140 108 C148 106 154 98 156 88 C158 76 156 64 152 55 C148 46 144 42 140 42 C136 42 132 46 128 55Z" fill="#111"/>
+  <!-- Eagle head -->
+  <ellipse cx="140" cy="50" rx="16" ry="14" fill="#111"/>
+  <!-- Eagle beak -->
+  <path d="M140 44 C148 42 155 46 154 54 C153 58 149 60 145 58 C142 54 140 50 140 44Z" fill="#111"/>
+  <!-- Eagle eye -->
+  <circle cx="133" cy="50" r="4" fill="#eee"/>
+  <circle cx="133" cy="50" r="2.5" fill="#111"/>
+  <circle cx="134.5" cy="49" r="1" fill="#eee"/>
+
+  <!-- Decorative floral/geometric fan shape below eagle -->
+  <path d="M90 118 Q110 110 140 108 Q170 110 190 118" stroke="#111" stroke-width="1" fill="none"/>
+  <!-- Fan petals -->
+  <path d="M100 118 C95 105 100 95 108 98 C112 100 112 112 108 118 Z" fill="#111" opacity="0.5"/>
+  <path d="M116 115 C112 102 118 92 126 95 C130 97 130 109 126 115 Z" fill="#111" opacity="0.6"/>
+  <path d="M140 113 C138 100 142 90 140 90 C138 90 136 100 134 113 Z" fill="#111" opacity="0.7"/>
+  <path d="M164 115 C168 102 162 92 154 95 C150 97 150 109 154 115 Z" fill="#111" opacity="0.6"/>
+  <path d="M180 118 C185 105 180 95 172 98 C168 100 168 112 172 118 Z" fill="#111" opacity="0.5"/>
+
+  <!-- Small dotwork around eagle -->
+  <circle cx="60" cy="78" r="1.5" fill="#111"/>
+  <circle cx="52" cy="92" r="1" fill="#111"/>
+  <circle cx="220" cy="78" r="1.5" fill="#111"/>
+  <circle cx="228" cy="92" r="1" fill="#111"/>
+
+  <!-- Geometric lines separator -->
+  <line x1="85" y1="130" x2="195" y2="130" stroke="#111" stroke-width="1"/>
+  <line x1="75" y1="134" x2="205" y2="134" stroke="#111" stroke-width="0.5"/>
+
+  <!-- Dotted line and numbers like Bruno uses -->
+  <path d="M55 155 L225 155" stroke="#111" stroke-width="0.6" stroke-dasharray="3,5"/>
+  <text x="200" y="152" font-family="'Courier New', monospace" font-size="9" fill="#111">0</text>
+  <text x="210" y="165" font-family="'Courier New', monospace" font-size="9" fill="#111">1</text>
+
+  <!-- Photo frame small - top left -->
+  <rect x="62" y="155" width="55" height="70" stroke="#111" stroke-width="1.2"/>
+  <rect x="66" y="159" width="47" height="62" stroke="#111" stroke-width="0.5"/>
+  <!-- Abstract fill (portrait silhouette) -->
+  <ellipse cx="89" cy="175" rx="14" ry="16" fill="#111" opacity="0.3"/>
+  <path d="M66 221 C74 205 104 205 113 221 L113 221" fill="#111" opacity="0.2"/>
+
+  <!-- Roman warrior bust - dominant center right -->
+  <!-- Torso/armor -->
+  <path d="M148 175 C143 185 140 200 142 218 C144 234 150 246 158 252 C162 256 166 258 170 258 L186 258 C190 256 194 252 196 246 C200 234 198 218 194 202 C190 186 182 175 174 170 C168 165 158 165 152 168 Z" fill="#111"/>
+
+  <!-- Pteruges (armor strips at waist) -->
+  <path d="M144 242 L148 262 L152 242" stroke="#111" stroke-width="1" fill="#111" opacity="0.7"/>
+  <path d="M152 242 L156 264 L160 242" stroke="#111" stroke-width="1" fill="#111" opacity="0.7"/>
+  <path d="M160 242 L164 264 L168 242" stroke="#111" stroke-width="1" fill="#111" opacity="0.7"/>
+  <path d="M168 242 L172 264 L176 242" stroke="#111" stroke-width="1" fill="#111" opacity="0.7"/>
+  <path d="M176 242 L180 262 L184 242" stroke="#111" stroke-width="1" fill="#111" opacity="0.7"/>
+  <path d="M184 242 L188 262 L192 242" stroke="#111" stroke-width="1" fill="#111" opacity="0.7"/>
+
+  <!-- Pauldron/shoulder armor -->
+  <path d="M142 175 C133 172 125 176 122 184 C120 190 124 198 130 198 C136 196 140 188 142 180 Z" fill="#111" opacity="0.9"/>
+
+  <!-- Neck -->
+  <rect x="160" y="155" width="18" height="20" rx="4" fill="#111"/>
+
+  <!-- Head - warrior helmet -->
+  <!-- Helmet main form -->
+  <path d="M148 100 C144 90 144 78 148 70 C152 62 160 58 168 60 C176 62 182 68 183 78 C185 88 183 100 178 108 C174 116 170 120 168 122 C163 120 158 116 154 110 Z" fill="#111"/>
+  <!-- Cheek guards -->
+  <path d="M148 100 C142 98 138 104 140 112 C142 118 148 120 152 116 C148 110 148 104 148 100Z" fill="#111"/>
+  <path d="M178 108 C184 106 188 112 186 120 C184 126 178 128 174 124 C178 118 178 112 178 108Z" fill="#111"/>
+  <!-- Helmet crest -->
+  <path d="M148 68 C152 55 160 46 168 46 C176 46 182 55 183 68" stroke="#111" stroke-width="2" fill="none"/>
+  <!-- Crest feathers -->
+  <path d="M150 65 C148 54 150 44 154 42 C156 40 158 44 156 52" fill="#111" opacity="0.7"/>
+  <path d="M155 62 C153 51 155 41 159 39 C161 37 163 41 161 49" fill="#111" opacity="0.8"/>
+  <path d="M160 61 C158 50 160 40 164 38 C166 36 168 40 166 48" fill="#111"/>
+  <path d="M165 62 C163 51 165 41 169 39 C171 37 173 41 171 49" fill="#111" opacity="0.8"/>
+  <path d="M170 65 C168 54 170 44 174 42 C176 40 178 44 176 52" fill="#111" opacity="0.7"/>
+  <!-- Eye visor slit -->
+  <path d="M150 100 C154 96 162 95 168 97 C165 101 158 102 150 100Z" fill="#333"/>
+
+  <!-- Photo frame smaller - below/overlapping -->
+  <rect x="60" y="240" width="50" height="55" stroke="#111" stroke-width="1.2"/>
+  <rect x="64" y="244" width="42" height="47" stroke="#111" stroke-width="0.5"/>
+  <!-- Abstract portrait in frame -->
+  <ellipse cx="85" cy="258" rx="12" ry="13" fill="#111" opacity="0.4"/>
+  <path d="M64 295 C72 280 98 280 102 295" fill="#111" opacity="0.25"/>
+
+  <!-- Geometric octagon at bottom -->
+  <circle cx="168" cy="340" r="24" stroke="#111" stroke-width="1.2" fill="none"/>
+  <polygon points="168,318 183,326 188,340 183,354 168,362 153,354 148,340 153,326" stroke="#111" stroke-width="0.8" fill="none"/>
+  <!-- Inner detail -->
+  <circle cx="168" cy="340" r="6" fill="#111"/>
+
+  <!-- Dotwork bottom area -->
+  <circle cx="118" cy="315" r="1.5" fill="#111"/>
+  <circle cx="112" cy="330" r="1" fill="#111"/>
+  <circle cx="116" cy="345" r="1.2" fill="#111"/>
+  <circle cx="220" cy="300" r="1.5" fill="#111"/>
+  <circle cx="225" cy="315" r="1" fill="#111"/>
+  <circle cx="218" cy="330" r="0.8" fill="#111"/>
+
+  <!-- Dotted horizontal line bottom -->
+  <path d="M88" y1="390" Q140 398 192 390" stroke="#111" stroke-width="0.7" stroke-dasharray="2,4" fill="none"/>
+  <line x1="88" y1="390" x2="192" y2="390" stroke="#111" stroke-width="0.7" stroke-dasharray="2,4"/>
+
+</svg>
