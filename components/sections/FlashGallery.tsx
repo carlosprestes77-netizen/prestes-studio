@@ -1,8 +1,33 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { flashItems } from "@/lib/data";
+
+function FlashImage({ src, name, style }: { src: string; name: string; style: string }) {
+  const [errored, setErrored] = useState(false);
+
+  if (errored) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-paper-100 p-8">
+        <p className="font-serif text-2xl text-ink font-bold text-center leading-tight">{name}</p>
+        <div className="w-8 h-px bg-paper-400" />
+        <p className="text-[9px] tracking-widest uppercase text-ink-faint">{style}</p>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={name}
+      onError={() => setErrored(true)}
+      className="w-full h-full object-contain p-6 group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+      draggable={false}
+    />
+  );
+}
 
 export default function FlashGallery() {
   return (
@@ -46,15 +71,9 @@ export default function FlashGallery() {
               transition={{ duration: 0.6, delay: i * 0.1 }}
               className="group bg-paper-50 flex flex-col"
             >
-              {/* Image area — large, white bg so ink SVG shows */}
+              {/* Image */}
               <div className="relative bg-white overflow-hidden" style={{ aspectRatio: "3/4" }}>
-                <img
-                  src={flash.src}
-                  alt={flash.name}
-                  className="w-full h-full object-contain p-8 group-hover:scale-[1.03] transition-transform duration-700 ease-out"
-                  draggable={false}
-                />
-                {/* Style badge */}
+                <FlashImage src={flash.src} name={flash.name} style={flash.style} />
                 <div className="absolute top-4 left-4">
                   <span className="text-[8px] tracking-widest uppercase bg-ink text-paper-100 px-2.5 py-1">
                     {flash.style}
@@ -68,11 +87,10 @@ export default function FlashGallery() {
                   <h3 className="font-serif text-xl text-ink font-semibold">{flash.name}</h3>
                   <p className="text-ink-muted text-xs leading-relaxed mt-1.5">{flash.description}</p>
                 </div>
-
                 <div className="mt-auto pt-4 border-t border-paper-200">
                   <a
                     href={`#orcamento?flash=${encodeURIComponent(flash.name)}`}
-                    className="inline-flex items-center gap-2 text-[9px] tracking-widest uppercase text-ink hover:text-gold transition-colors duration-300"
+                    className="inline-flex items-center gap-2 text-[9px] tracking-widest uppercase text-ink hover:text-gold-light transition-colors duration-300"
                   >
                     Quero este flash <ArrowRight size={10} />
                   </a>
