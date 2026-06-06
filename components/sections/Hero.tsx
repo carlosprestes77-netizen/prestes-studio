@@ -3,6 +3,8 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
+const HERO_BG = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/portfolio/fortis-fortuna.jpg`;
+
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -21,7 +23,7 @@ export default function Hero() {
         <div
           className="absolute inset-0 bg-cover bg-center scale-110"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?w=1920&q=90')`,
+            backgroundImage: `url('${HERO_BG}')`,
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-paper-950/95 via-paper-950/55 to-paper-950/30" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { ARTIST } from "@/lib/data";
 
 const values = [
   { n: "I", title: "Microrealismo + Geometria", desc: "Cada composição une realismo fotográfico com geometria sagrada — proporções matemáticas, órbitas, constelações. Uma linguagem única." },
@@ -22,11 +23,11 @@ export default function Studio() {
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             className="relative"
           >
-            <div className="relative aspect-[3/4] overflow-hidden">
+            <div className="relative aspect-[3/4] overflow-hidden bg-paper-300">
               <img
-                src="https://images.unsplash.com/photo-1590246814883-57c511e16514?w=900&q=85"
-                alt="Bruno Beltrami"
-                className="w-full h-full object-cover"
+                src={ARTIST.portrait}
+                alt="Bruno Beltrami no estúdio"
+                className="w-full h-full object-cover object-top"
               />
             </div>
             {/* Offset label card */}

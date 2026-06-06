@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { portfolioItems } from "@/lib/data";
 
 const filters = ["Todos", "Neo-Geométrico", "Collage", "Neo-Clássico"];
@@ -73,12 +72,11 @@ export default function Portfolio() {
                   item.size === "large" ? "aspect-[3/4]" : item.size === "small" ? "aspect-square" : "aspect-[4/5]"
                 }`}
               >
-                <Image
+                <img
                   src={item.src}
                   alt={item.alt}
-                  fill
-                  className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-[1.04] transition-all duration-700 ease-out"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-[1.04] transition-all duration-700 ease-out"
                 />
                 {/* Always-visible gradient + label */}
                 <div className="absolute inset-0 bg-gradient-to-t from-paper-950/80 via-paper-950/20 to-transparent" />

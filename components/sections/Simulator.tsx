@@ -267,10 +267,10 @@ export default function Simulator() {
                     onTouchStart={onTouchStart}
                   >
                     <img
-                      src={selected.src}
+                      src={selected.simSrc}
                       alt={selected.name}
                       className="select-none pointer-events-none block"
-                      style={{ width: "140px", height: "auto", mixBlendMode: "multiply", filter: "contrast(1.05)" }}
+                      style={{ width: "150px", height: "auto", mixBlendMode: "multiply", filter: "contrast(1.08)", opacity: 0.92 }}
                       draggable={false}
                     />
                     <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[8px] text-ink-muted tracking-wider whitespace-nowrap pointer-events-none">
