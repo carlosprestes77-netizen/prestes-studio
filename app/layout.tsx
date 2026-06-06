@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Playfair_Display, Raleway } from "next/font/google";
 import "./globals.css";
 
-const cormorant = Cormorant_Garamond({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-cormorant",
+  weight: ["400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-playfair",
   display: "swap",
 });
 
-const inter = Inter({
+const raleway = Raleway({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-raleway",
   display: "swap",
 });
 
@@ -34,8 +35,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${cormorant.variable} ${inter.variable}`}>
-      <body className="bg-ink-950 text-ink-100 font-sans antialiased">{children}</body>
+    <html lang="pt-BR" className={`${playfair.variable} ${raleway.variable}`}>
+      <body className="bg-paper-200 text-ink font-sans antialiased">{children}</body>
     </html>
   );
 }

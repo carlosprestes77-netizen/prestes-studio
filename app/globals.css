@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --font-cormorant: "Cormorant Garamond", serif;
-  --font-inter: "Inter", sans-serif;
+  --font-playfair: "Playfair Display", serif;
+  --font-raleway: "Raleway", sans-serif;
 }
 
 @layer base {
@@ -21,7 +21,7 @@
   body {
     background-color: #ece6d9;
     color: #0f0c08;
-    font-family: var(--font-inter), sans-serif;
+    font-family: var(--font-raleway), sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
