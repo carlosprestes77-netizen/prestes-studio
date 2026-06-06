@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 480" fill="none">
+
+  <!-- VENI VIDI VICI text block - left side, large serif -->
+  <text x="52" y="185" font-family="'Times New Roman', Georgia, serif" font-size="28" letter-spacing="4" fill="#111" font-weight="400">VENI</text>
+  <text x="52" y="220" font-family="'Times New Roman', Georgia, serif" font-size="28" letter-spacing="4" fill="#111" font-weight="400">VIDI</text>
+  <text x="52" y="255" font-family="'Times New Roman', Georgia, serif" font-size="28" letter-spacing="4" fill="#111" font-weight="400">VICI</text>
+
+  <!-- Roman warrior statue - right/center, side profile facing left -->
+  <!-- Torso/armor - muscular cuirass -->
+  <path d="M155 175 C150 188 148 205 150 224 C152 240 158 254 166 262 C170 266 174 268 178 268 C182 268 188 265 193 260 C200 252 204 238 206 224 C208 208 206 190 202 176 C198 164 190 158 182 156 C174 154 164 158 158 165 Z" fill="#111"/>
+
+  <!-- Pteruges at waist (leather strips) -->
+  <path d="M150 250 L153 272 L157 250" fill="#111" opacity="0.75"/>
+  <path d="M157 250 L160 274 L164 250" fill="#111" opacity="0.8"/>
+  <path d="M164 250 L167 276 L171 250" fill="#111" opacity="0.85"/>
+  <path d="M171 250 L174 276 L178 250" fill="#111" opacity="0.85"/>
+  <path d="M178 250 L181 274 L185 250" fill="#111" opacity="0.8"/>
+  <path d="M185 250 L188 272 L192 250" fill="#111" opacity="0.75"/>
+  <path d="M192 250 L195 268 L199 250" fill="#111" opacity="0.65"/>
+
+  <!-- Left pauldron (shoulder guard) -->
+  <path d="M150 175 C140 172 132 178 130 188 C128 196 132 206 140 206 C144 204 148 196 150 188 Z" fill="#111"/>
+  <!-- Shoulder strip -->
+  <path d="M148 172 L144 164 L156 166 L155 174 Z" fill="#111"/>
+
+  <!-- Neck -->
+  <rect x="172" y="155" width="16" height="22" rx="3" fill="#111"/>
+
+  <!-- Head with Corinthian helmet -->
+  <!-- Helmet main bowl -->
+  <path d="M158 90 C155 80 155 68 158 60 C162 52 168 47 176 47 C184 47 190 52 193 60 C196 68 196 80 193 90 C189 100 185 108 182 112 C178 116 174 118 172 118 C168 118 164 115 161 110 Z" fill="#111"/>
+
+  <!-- Face/visor opening - classical profile -->
+  <path d="M158 88 C155 82 154 74 156 68 C158 62 162 58 166 60 C168 62 168 70 166 78 C164 86 162 92 158 88Z" fill="#1a1a1a" opacity="0.4"/>
+
+  <!-- Cheek guard -->
+  <path d="M160 92 C156 90 152 96 154 104 C156 110 160 112 162 108 C160 102 160 96 160 92Z" fill="#111"/>
+
+  <!-- Nose guard -->
+  <path d="M165 68 L163 90 L168 90 L166 68 Z" fill="#111"/>
+
+  <!-- Helmet crest - horsehair plume -->
+  <path d="M158 58 C160 44 164 30 168 22 C172 30 176 44 178 58" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Plume feathers -->
+  <path d="M160 54 C156 40 155 26 158 18 C160 14 163 16 162 28 C161 38 160 48 160 54Z" fill="#111" opacity="0.7"/>
+  <path d="M164 52 C160 38 159 24 162 16 C164 12 167 14 166 26 C165 36 164 46 164 52Z" fill="#111" opacity="0.85"/>
+  <path d="M168 51 C165 37 164 23 168 15 C170 11 173 13 172 25 C171 35 169 44 168 51Z" fill="#111"/>
+  <path d="M172 52 C170 38 170 24 174 16 C176 12 179 14 178 26 C177 36 174 46 172 52Z" fill="#111" opacity="0.85"/>
+  <path d="M176 54 C175 40 176 26 180 18 C182 14 185 16 183 28 C182 38 178 48 176 54Z" fill="#111" opacity="0.7"/>
+
+  <!-- Eye (visible in profile) -->
+  <circle cx="163" cy="82" r="4" fill="#eee"/>
+  <circle cx="163" cy="82" r="2.5" fill="#333"/>
+  <circle cx="163" cy="82" r="1.5" fill="#111"/>
+
+  <!-- Muscle detail lines on armor -->
+  <path d="M162 190 C166 186 172 185 176 188" stroke="#333" stroke-width="0.8"/>
+  <path d="M160 202 C164 198 170 197 175 200" stroke="#333" stroke-width="0.7"/>
+  <path d="M160 214 C164 210 170 209 175 212" stroke="#333" stroke-width="0.7"/>
+  <path d="M162 226 C166 222 172 221 176 224" stroke="#333" stroke-width="0.6"/>
+
+  <!-- Geometric circle overlapping composition -->
+  <circle cx="170" cy="210" r="58" stroke="#111" stroke-width="1.2" fill="none"/>
+  <circle cx="170" cy="210" r="50" stroke="#111" stroke-width="0.4" fill="none"/>
+
+  <!-- Rectangle photo frame element -->
+  <rect x="148" y="150" width="70" height="120" stroke="#111" stroke-width="1" fill="none"/>
+
+  <!-- Horizontal decorative lines through mid -->
+  <line x1="50" y1="272" x2="230" y2="272" stroke="#111" stroke-width="0.8"/>
+  <line x1="50" y1="268" x2="160" y2="268" stroke="#111" stroke-width="0.5"/>
+
+  <!-- Bar-chart / architectural geometry at bottom (like in Bruno's work) -->
+  <!-- Step pyramid bars -->
+  <rect x="130" y="310" width="18" height="80" fill="#111"/>
+  <rect x="152" y="325" width="12" height="65" fill="#111" opacity="0.7"/>
+  <rect x="168" y="340" width="10" height="50" fill="#111" opacity="0.5"/>
+
+  <!-- Geometric octagon/compass bottom left -->
+  <circle cx="90" cy="355" r="20" stroke="#111" stroke-width="1" fill="none"/>
+  <polygon points="90,337 102,344 106,355 102,366 90,373 78,366 74,355 78,344" stroke="#111" stroke-width="0.7" fill="none"/>
+  <circle cx="90" cy="355" r="5" fill="#111"/>
+
+  <!-- Dotwork scattered -->
+  <circle cx="48" cy="138" r="1.5" fill="#111"/>
+  <circle cx="44" cy="152" r="1" fill="#111"/>
+  <circle cx="50" cy="165" r="1.2" fill="#111"/>
+  <circle cx="44" cy="176" r="0.8" fill="#111"/>
+
+  <circle cx="230" cy="285" r="1.5" fill="#111"/>
+  <circle cx="236" cy="298" r="1" fill="#111"/>
+  <circle cx="228" cy="312" r="0.8" fill="#111"/>
+
+  <!-- Key symbol (small, decorative) -->
+  <circle cx="72" cy="295" r="6" stroke="#111" stroke-width="1.2" fill="none"/>
+  <line x1="72" y1="301" x2="72" y2="325" stroke="#111" stroke-width="1.2"/>
+  <line x1="72" y1="316" x2="78" y2="316" stroke="#111" stroke-width="1.2"/>
+  <line x1="72" y1="322" x2="76" y2="322" stroke="#111" stroke-width="1.2"/>
+
+  <!-- Dotted line across bottom -->
+  <line x1="50" y1="420" x2="230" y2="420" stroke="#111" stroke-width="0.6" stroke-dasharray="2,5"/>
+  <circle cx="50" cy="420" r="2.5" fill="#111" opacity="0.6"/>
+  <circle cx="230" cy="420" r="2.5" fill="#111" opacity="0.6"/>
+
+</svg>

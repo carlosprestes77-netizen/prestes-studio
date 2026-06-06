@@ -1,0 +1,101 @@
+export const ARTIST = {
+  name: "Bruno Beltrami",
+  handle: "@bruno.belt",
+  instagram: "https://www.instagram.com/bruno.belt",
+  whatsapp: "5548998663124",
+  location: "Santa Catarina — Brasil",
+};
+
+export const portfolioItems = [
+  {
+    id: 1,
+    src: "https://images.unsplash.com/photo-1565058379802-bbe93b2f703a?w=800&q=90",
+    alt: "Geométrico com águia realista",
+    style: "Neo-Geométrico",
+    placement: "Antebraço",
+    size: "medium",
+  },
+  {
+    id: 2,
+    src: "https://images.unsplash.com/photo-1590246814883-57c511e16514?w=800&q=90",
+    alt: "Colagem surrealista floral",
+    style: "Collage",
+    placement: "Costela",
+    size: "large",
+  },
+  {
+    id: 3,
+    src: "https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?w=800&q=90",
+    alt: "Figura clássica com dotwork",
+    style: "Neo-Clássico",
+    placement: "Perna",
+    size: "small",
+  },
+  {
+    id: 4,
+    src: "https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?w=800&q=90",
+    alt: "Composição geométrica com coruja",
+    style: "Neo-Geométrico",
+    placement: "Costas",
+    size: "large",
+  },
+  {
+    id: 5,
+    src: "https://images.unsplash.com/photo-1607083205523-7e05b7eb6a0c?w=800&q=90",
+    alt: "Surrealismo botânico",
+    style: "Collage",
+    placement: "Tornozelo",
+    size: "small",
+  },
+  {
+    id: 6,
+    src: "https://images.unsplash.com/photo-1542382943-3ac575b0c48d?w=800&q=90",
+    alt: "Estátua romana com geometria",
+    style: "Neo-Clássico",
+    placement: "Ombro",
+    size: "medium",
+  },
+];
+
+export const flashItems = [
+  {
+    id: "flash-01",
+    name: "Rosa e Mão",
+    style: "Collage",
+    description: "Mão segurando rosa com elementos surrealistas e olhos ocultos",
+    src: "/flashes/rosa-mao.png",
+    placeholder: "🌹",
+  },
+  {
+    id: "flash-02",
+    name: "Águia Courage",
+    style: "Neo-Geométrico",
+    description: "Águia realista com estrutura geométrica e tipografia COURAGE",
+    src: "/flashes/aguia-courage.png",
+    placeholder: "🦅",
+  },
+  {
+    id: "flash-03",
+    name: "Coruja Maçônica",
+    style: "Neo-Geométrico",
+    description: "Coruja em voo com coluna jônica e símbolos maçônicos",
+    src: "/flashes/coruja-maconica.png",
+    placeholder: "🦉",
+  },
+  {
+    id: "flash-04",
+    name: "Guerreiro e Águia",
+    style: "Neo-Clássico",
+    description: "Busto de guerreiro romano com águia em colagem geométrica",
+    src: "/flashes/guerreiro-aguia.png",
+    placeholder: "⚔️",
+  },
+  {
+    id: "flash-05",
+    name: "Veni Vidi Vici",
+    style: "Neo-Clássico",
+    description: "Estatua romana do guerreiro com tipografia clássica e geometria",
+    src: "/flashes/veni-vidi-vici.png",
+    placeholder: "🏛️",
+  },
+];
