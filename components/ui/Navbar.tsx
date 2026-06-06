@@ -9,8 +9,10 @@ const links = [
   { label: "Portfólio", href: "#portfolio" },
   { label: "Flashes", href: "#flashes" },
   { label: "Simulador", href: "#simulador" },
-  { label: "O Artista", href: "#estudio" },
-  { label: "Orçamento", href: "#orcamento" },
+  { label: "Processo", href: "#processo" },
+  { label: "Artista", href: "#estudio" },
+  { label: "Depoimentos", href: "#depoimentos" },
+  { label: "FAQ", href: "#faq" },
 ];
 
 export default function Navbar() {
@@ -48,12 +50,12 @@ export default function Navbar() {
           </a>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex items-center gap-10 lg:gap-14">
+          <div className="hidden lg:flex items-center gap-6 xl:gap-9">
             {links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-[10px] tracking-widest uppercase text-ink-muted hover:text-ink transition-colors duration-300 relative group font-light"
+                className="text-[10px] tracking-widest uppercase text-ink-muted hover:text-ink transition-colors duration-300 relative group font-light whitespace-nowrap"
               >
                 {link.label}
                 <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-ink transition-all duration-300 group-hover:w-full" />
@@ -62,14 +64,14 @@ export default function Navbar() {
           </div>
 
           {/* CTA */}
-          <a href="#orcamento" className="hidden md:inline-flex btn-outline text-[9px] py-2.5 px-5">
+          <a href="#orcamento" className="hidden lg:inline-flex btn-outline text-[9px] py-2.5 px-5">
             Agendar
           </a>
 
           {/* Mobile Toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-ink hover:text-gold transition-colors"
+            className="lg:hidden text-ink hover:text-gold transition-colors"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X size={18} /> : <Menu size={18} />}
@@ -85,7 +87,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-40 glass-paper border-b border-paper-300 md:hidden"
+            className="fixed inset-x-0 top-16 z-40 glass-paper border-b border-paper-300 lg:hidden"
           >
             <div className="px-6 py-8 flex flex-col gap-6">
               {links.map((link) => (

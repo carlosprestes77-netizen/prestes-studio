@@ -99,7 +99,7 @@ export default function QuoteForm() {
             className="space-y-8"
           >
             <div>
-              <p className="label-section mb-4">04 — Orçamento</p>
+              <p className="label-section mb-4">08 — Orçamento</p>
               <h2 className="font-serif font-light leading-[0.95] tracking-tight text-ink"
                 style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}>
                 Vamos

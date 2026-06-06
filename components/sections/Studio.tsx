@@ -51,7 +51,7 @@ export default function Studio() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <p className="label-section mb-4">03 — O Artista</p>
+              <p className="label-section mb-4">05 — O Artista</p>
               <h2
                 className="font-serif leading-[0.92] tracking-tight text-ink"
                 style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", fontWeight: 700 }}

@@ -6,8 +6,116 @@ export const ARTIST = {
   instagram: "https://www.instagram.com/bruno.belt",
   whatsapp: "5548998663124",
   location: "Santa Catarina — Brasil",
+  city: "Florianópolis · Santa Catarina",
   portrait: `${bp}/artist/bruno.jpg`,
+  hours: [
+    { day: "Seg — Sex", time: "10h — 19h" },
+    { day: "Sábado", time: "10h — 16h" },
+    { day: "Domingo", time: "Fechado" },
+  ],
 };
+
+// Trust / credibility numbers
+export const stats = [
+  { value: "+500", label: "Peças realizadas" },
+  { value: "8", label: "Anos de carreira" },
+  { value: "60d", label: "Retoque garantido" },
+  { value: "100%", label: "Material descartável" },
+];
+
+// How it works — the client journey, builds trust and sets expectations
+export const processSteps = [
+  {
+    n: "01",
+    title: "Conversa",
+    desc: "Você manda sua ideia pelo WhatsApp ou pelo formulário. Conversamos sobre conceito, referências, local do corpo e tamanho. Briefing sem compromisso.",
+  },
+  {
+    n: "02",
+    title: "Projeto",
+    desc: "Desenvolvo um desenho autoral exclusivo para você. Ajustamos juntos até cada linha fazer sentido. O projeto é só seu — nunca se repete em outra pele.",
+  },
+  {
+    n: "03",
+    title: "Sessão",
+    desc: "Estúdio privativo, material 100% descartável e ambiente tranquilo. Trabalho com calma e precisão, no seu ritmo, do começo ao fim.",
+  },
+  {
+    n: "04",
+    title: "Cuidado",
+    desc: "Você sai com um guia completo de cicatrização. Acompanho a cura de perto e os retoques estão inclusos nos primeiros 60 dias. A relação não acaba na agulha.",
+  },
+];
+
+// Social proof
+export const testimonials = [
+  {
+    name: "Mariana Costa",
+    work: "Memento Mori · Antebraço",
+    quote: "O Bruno transformou uma ideia confusa na minha cabeça em uma obra que eu olho todo dia e me emociono. A precisão da geometria é absurda. Cicatrizou perfeita.",
+  },
+  {
+    name: "Rafael Andrade",
+    work: "Manga Neo-Clássica · Braço",
+    quote: "Pesquisei tatuadores por meses. Nenhum chegava perto do nível dele em microrealismo. Atendimento impecável, estúdio limpíssimo e o resultado superou tudo.",
+  },
+  {
+    name: "Juliana Mendes",
+    work: "Sapientia · Costas",
+    quote: "Mais de seis horas de sessão e o cuidado dele me deixou tranquila o tempo todo. Cada detalhe pensado. Vale cada minuto e cada centavo. Já estou planejando a próxima.",
+  },
+  {
+    name: "Lucas Ferreira",
+    work: "Imperator · Peito",
+    quote: "O simulador do site me ajudou a visualizar antes mesmo de fechar. Quando vi na pele, era exatamente aquilo. Profissionalismo de outro patamar.",
+  },
+  {
+    name: "Camila Rocha",
+    work: "Psyché · Ombro",
+    quote: "Linhas finas que não borraram, traço firme e um conceito que conta a minha história. O Bruno é artista de verdade, não só tatuador. Recomendo de olhos fechados.",
+  },
+  {
+    name: "Thiago Almeida",
+    work: "Navigator · Ombro",
+    quote: "Ambiente acolhedor, conversa franca e zero pressa. Ele respeitou minha ideia e elevou ela. A cicatrização foi tranquila seguindo o guia que ele passou.",
+  },
+];
+
+// FAQ — reduces friction before booking (deposit, pain, healing, pricing)
+export const faqs = [
+  {
+    q: "Como funciona o orçamento?",
+    a: "É gratuito e sem compromisso. Você descreve a ideia pelo formulário ou WhatsApp, e eu retorno com uma estimativa de valor e tempo de sessão. O preço varia conforme tamanho, complexidade e local do corpo.",
+  },
+  {
+    q: "Preciso pagar sinal para agendar?",
+    a: "Sim. Para reservar a data é necessário um sinal, que é descontado do valor final da tatuagem. Ele garante o horário e cobre o tempo dedicado ao desenvolvimento do seu projeto exclusivo.",
+  },
+  {
+    q: "Dói muito? Como me preparo?",
+    a: "A sensação varia por pessoa e região do corpo. Durma bem, hidrate-se, faça uma boa refeição antes e evite álcool nas 24h anteriores. No dia, vá com roupa confortável que dê acesso fácil ao local da tatuagem.",
+  },
+  {
+    q: "Como é a cicatrização?",
+    a: "Você sai com um guia completo de cuidados. Em geral a pele cicatriza entre 15 e 30 dias. Mantenha limpo, hidratado e longe de sol e mar nas primeiras semanas. Eu acompanho a cura de perto por mensagem.",
+  },
+  {
+    q: "Os retoques são cobrados?",
+    a: "Não nos primeiros 60 dias. Retoques de cicatrização dentro desse prazo estão inclusos. Depois disso, retoques são avaliados individualmente.",
+  },
+  {
+    q: "Posso levar minha própria ideia ou referência?",
+    a: "Com certeza — e é incentivado. Trabalho com projetos autorais, então uso suas referências como ponto de partida para criar algo único, nunca uma cópia. Cada flash é vendido uma única vez.",
+  },
+  {
+    q: "Qual a idade mínima?",
+    a: "É necessário ter 18 anos completos e apresentar documento com foto no dia da sessão. Não realizo tatuagens em menores de idade, mesmo com autorização.",
+  },
+  {
+    q: "O material é seguro?",
+    a: "Sempre. Trabalho com material 100% descartável, agulhas lacradas abertas na sua frente e biossegurança rigorosa. Sua saúde é inegociável.",
+  },
+];
 
 export const portfolioItems = [
   {

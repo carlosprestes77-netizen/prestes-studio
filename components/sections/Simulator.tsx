@@ -259,7 +259,7 @@ export default function Simulator() {
           className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14"
         >
           <div>
-            <p className="label-section mb-4">02 — Simulador Virtual</p>
+            <p className="label-section mb-4">03 — Simulador Virtual</p>
             <h2
               className="font-serif font-light leading-[0.95] tracking-tight text-ink"
               style={{ fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
