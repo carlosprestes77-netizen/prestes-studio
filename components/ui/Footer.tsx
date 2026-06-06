@@ -21,7 +21,7 @@ export default function Footer() {
           <div className="space-y-4">
             <p className="text-[9px] tracking-widest uppercase text-paper-600">Navegação</p>
             <div className="space-y-2.5">
-              {[["Portfólio", "#portfolio"], ["Simulador", "#simulador"], ["O Artista", "#estudio"], ["Orçamento", "#orcamento"]].map(([l, h]) => (
+              {[["Portfólio", "#portfolio"], ["Flashes", "#flashes"], ["Simulador", "#simulador"], ["O Artista", "#estudio"], ["Orçamento", "#orcamento"]].map(([l, h]) => (
                 <a key={h} href={h} className="block text-xs text-paper-500 hover:text-paper-200 transition-colors duration-300">{l}</a>
               ))}
             </div>

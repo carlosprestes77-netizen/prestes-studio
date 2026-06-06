@@ -1,3 +1,5 @@
+const bp = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
 export const ARTIST = {
   name: "Bruno Beltrami",
   handle: "@bruno.belt",
@@ -69,7 +71,7 @@ export const flashItems = [
     name: "Rosa e Mão",
     style: "Collage",
     description: "Mão segurando rosa com elementos surrealistas e olhos ocultos",
-    src: "/flashes/rosa-mao.svg",
+    src: `${bp}/flashes/rosa-mao.svg`,
     placeholder: "🌹",
   },
   {
@@ -77,7 +79,7 @@ export const flashItems = [
     name: "Águia Courage",
     style: "Neo-Geométrico",
     description: "Águia realista com estrutura geométrica e tipografia COURAGE",
-    src: "/flashes/aguia-courage.svg",
+    src: `${bp}/flashes/aguia-courage.svg`,
     placeholder: "🦅",
   },
   {
@@ -85,7 +87,7 @@ export const flashItems = [
     name: "Coruja Maçônica",
     style: "Neo-Geométrico",
     description: "Coruja em voo com coluna jônica e símbolos maçônicos",
-    src: "/flashes/coruja-maconica.svg",
+    src: `${bp}/flashes/coruja-maconica.svg`,
     placeholder: "🦉",
   },
   {
@@ -93,7 +95,7 @@ export const flashItems = [
     name: "Guerreiro e Águia",
     style: "Neo-Clássico",
     description: "Busto de guerreiro romano com águia em colagem geométrica",
-    src: "/flashes/guerreiro-aguia.svg",
+    src: `${bp}/flashes/guerreiro-aguia.svg`,
     placeholder: "⚔️",
   },
   {
@@ -101,7 +103,7 @@ export const flashItems = [
     name: "Veni Vidi Vici",
     style: "Neo-Clássico",
     description: "Estatua romana do guerreiro com tipografia clássica e geometria",
-    src: "/flashes/veni-vidi-vici.svg",
+    src: `${bp}/flashes/veni-vidi-vici.svg`,
     placeholder: "🏛️",
   },
 ];
