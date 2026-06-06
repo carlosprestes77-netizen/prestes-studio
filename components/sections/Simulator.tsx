@@ -10,90 +10,163 @@ import { flashItems } from "@/lib/data";
 
 interface TattooTransform { x: number; y: number; scale: number; rotation: number }
 const INITIAL: TattooTransform = { x: 0, y: 0, scale: 1, rotation: 0 };
-const TATTOO_BASE_PX = 150;
+const BASE_PX = 150;
 
-function detectBodyPlacement(
-  imgEl: HTMLImageElement,
-  containerW: number,
-  containerH: number,
+// --- Coordinate helper ---
+function normToContainer(
+  nx: number, ny: number, scale: number,
+  img: HTMLImageElement, cW: number, cH: number,
 ): TattooTransform {
-  // Sample at reduced resolution for speed
-  const S = 128;
-  const canvas = document.createElement("canvas");
-  canvas.width = S; canvas.height = S;
-  const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(imgEl, 0, 0, S, S);
-  const { data } = ctx.getImageData(0, 0, S, S);
-
-  // Center-of-mass of non-background pixels
-  let sumX = 0, sumY = 0, count = 0;
-  let bx0 = S, bx1 = 0, by0 = S, by1 = 0;
-
-  for (let y = 0; y < S; y++) {
-    for (let x = 0; x < S; x++) {
-      const i = (y * S + x) * 4;
-      const r = data[i], g = data[i + 1], b = data[i + 2];
-      const lum = (r + g + b) / 3;
-      const range = Math.max(r, g, b) - Math.min(r, g, b);
-      // Skip: near-white backgrounds, near-black, uniform light-gray backgrounds
-      if (lum > 238 || lum < 18 || (lum > 200 && range < 12)) continue;
-      sumX += x; sumY += y; count++;
-      if (x < bx0) bx0 = x; if (x > bx1) bx1 = x;
-      if (y < by0) by0 = y; if (y > by1) by1 = y;
-    }
-  }
-
-  // Not enough content found — fall back to image center
-  if (count < 80) return INITIAL;
-
-  const cxN = sumX / count / S; // normalized [0,1] center x
-  const cyN = sumY / count / S; // normalized [0,1] center y
-  const bodyWN = (bx1 - bx0) / S;  // body width in normalized units
-
-  // Transform normalized image coords → container pixel coords
-  // using the same math as CSS object-cover
-  const imgAspect = imgEl.naturalWidth / imgEl.naturalHeight;
-  const contAspect = containerW / containerH;
-
-  let dispW: number, dispH: number, cropX: number, cropY: number;
-  if (imgAspect > contAspect) {
-    // image wider than container → fit by height, crop sides
-    dispH = containerH;
-    dispW = containerH * imgAspect;
-    cropX = (dispW - containerW) / 2;
-    cropY = 0;
-  } else {
-    // image taller than container → fit by width, crop top/bottom
-    dispW = containerW;
-    dispH = containerW / imgAspect;
-    cropX = 0;
-    cropY = (dispH - containerH) / 2;
-  }
-
-  const canvasX = cxN * dispW - cropX;
-  const canvasY = cyN * dispH - cropY;
-
-  // Offset from container center (the transform origin of the overlay)
-  const offsetX = canvasX - containerW / 2;
-  const offsetY = canvasY - containerH / 2;
-
-  // Auto scale: tattoo ≈ 28% of the detected body width in canvas pixels
-  const bodyWpx = bodyWN * dispW;
-  const targetPx = Math.max(90, Math.min(280, bodyWpx * 0.28));
-  const autoScale = targetPx / TATTOO_BASE_PX;
-
-  return { x: offsetX, y: offsetY, scale: autoScale, rotation: 0 };
+  const ia = img.naturalWidth / img.naturalHeight;
+  const ca = cW / cH;
+  let dW: number, dH: number, cx: number, cy: number;
+  if (ia > ca) { dH = cH; dW = cH * ia; cx = (dW - cW) / 2; cy = 0; }
+  else          { dW = cW; dH = cW / ia; cx = 0; cy = (dH - cH) / 2; }
+  return {
+    x: nx * dW - cx - cW / 2,
+    y: ny * dH - cy - cH / 2,
+    scale, rotation: 0,
+  };
 }
+
+// --- Fallback: pixel centre-of-mass ---
+function pixelFallback(img: HTMLImageElement, cW: number, cH: number): TattooTransform {
+  const S = 128;
+  const cv = document.createElement("canvas");
+  cv.width = S; cv.height = S;
+  const ctx = cv.getContext("2d")!;
+  ctx.drawImage(img, 0, 0, S, S);
+  const { data } = ctx.getImageData(0, 0, S, S);
+  let sx = 0, sy = 0, n = 0, x0 = S, x1 = 0;
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+    const i = (y * S + x) * 4;
+    const r = data[i], g = data[i+1], b = data[i+2];
+    const lum = (r+g+b)/3, rng = Math.max(r,g,b)-Math.min(r,g,b);
+    if (lum > 238 || lum < 18 || (lum > 200 && rng < 12)) continue;
+    sx += x; sy += y; n++;
+    if (x < x0) x0 = x; if (x > x1) x1 = x;
+  }
+  if (n < 80) return INITIAL;
+  const bw = (x1 - x0) / S;
+  const tgt = Math.max(90, Math.min(280, bw * cW * 0.28));
+  return normToContainer(sx/n/S, sy/n/S, tgt/BASE_PX, img, cW, cH);
+}
+
+// --- TF.js detector cache (loaded once) ---
+let detectorPromise: Promise<any> | null = null;
+function getDetector() {
+  if (detectorPromise) return detectorPromise;
+  detectorPromise = (async () => {
+    // Dynamic imports — only loaded when a user uploads a photo
+    const tf = await import("@tensorflow/tfjs");
+    try { await tf.setBackend("webgl"); } catch { await tf.setBackend("cpu"); }
+    await tf.ready();
+    const pd = await import("@tensorflow-models/pose-detection");
+    return pd.createDetector(pd.SupportedModels.MoveNet, {
+      modelType: (pd as any).movenet.modelType.SINGLEPOSE_LIGHTNING,
+    });
+  })();
+  return detectorPromise;
+}
+
+const MIN_CONF = 0.25;
+type KP = Record<string, { x: number; y: number; score: number }>;
+
+function placementFromPose(kps: KP, img: HTMLImageElement, cW: number, cH: number): TattooTransform {
+  const has = (k: string) => (kps[k]?.score ?? 0) > MIN_CONF;
+  const mid = (a: string, b: string) => ({ x: (kps[a].x + kps[b].x) / 2, y: (kps[a].y + kps[b].y) / 2 });
+  const W = img.naturalWidth, H = img.naturalHeight;
+
+  // Normalize keypoints from pixel → [0,1]
+  const nkp: KP = {};
+  for (const [name, kp] of Object.entries(kps)) {
+    nkp[name] = { x: kp.x / W, y: kp.y / H, score: kp.score };
+  }
+  const hn = (k: string) => (nkp[k]?.score ?? 0) > MIN_CONF;
+  const mn = (a: string, b: string) => ({ x: (nkp[a].x + nkp[b].x)/2, y: (nkp[a].y + nkp[b].y)/2 });
+
+  // Priority: lower arm → upper arm → shoulder → chest → thigh → calf
+  if (hn("left_wrist") && hn("left_elbow")) {
+    const p = mn("left_wrist", "left_elbow");
+    return normToContainer(p.x, p.y, 0.88, img, cW, cH);
+  }
+  if (hn("right_wrist") && hn("right_elbow")) {
+    const p = mn("right_wrist", "right_elbow");
+    return normToContainer(p.x, p.y, 0.88, img, cW, cH);
+  }
+  if (hn("left_elbow") && hn("left_shoulder")) {
+    const p = mn("left_elbow", "left_shoulder");
+    return normToContainer(p.x, p.y, 1.0, img, cW, cH);
+  }
+  if (hn("right_elbow") && hn("right_shoulder")) {
+    const p = mn("right_elbow", "right_shoulder");
+    return normToContainer(p.x, p.y, 1.0, img, cW, cH);
+  }
+  if (hn("left_shoulder") && hn("right_shoulder")) {
+    // Chest: midpoint between shoulders, slight downward shift
+    const x = (nkp["left_shoulder"].x + nkp["right_shoulder"].x) / 2;
+    const y = (nkp["left_shoulder"].y + nkp["right_shoulder"].y) / 2 + 0.07;
+    return normToContainer(x, y, 1.5, img, cW, cH);
+  }
+  if (hn("left_shoulder") || hn("right_shoulder")) {
+    const k = hn("left_shoulder") ? "left_shoulder" : "right_shoulder";
+    return normToContainer(nkp[k].x, nkp[k].y, 1.1, img, cW, cH);
+  }
+  if (hn("left_hip") && hn("left_knee")) {
+    const p = mn("left_hip", "left_knee");
+    return normToContainer(p.x, p.y, 1.3, img, cW, cH);
+  }
+  if (hn("right_hip") && hn("right_knee")) {
+    const p = mn("right_hip", "right_knee");
+    return normToContainer(p.x, p.y, 1.3, img, cW, cH);
+  }
+  if (hn("left_knee") && hn("left_ankle")) {
+    const p = mn("left_knee", "left_ankle");
+    return normToContainer(p.x, p.y, 1.0, img, cW, cH);
+  }
+  if (hn("right_knee") && hn("right_ankle")) {
+    const p = mn("right_knee", "right_ankle");
+    return normToContainer(p.x, p.y, 1.0, img, cW, cH);
+  }
+  // No confident keypoints found → pixel fallback
+  return pixelFallback(img, cW, cH);
+}
+
+async function detectAndPlace(
+  img: HTMLImageElement,
+  cW: number, cH: number,
+  onStatus: (s: string) => void,
+): Promise<TattooTransform> {
+  try {
+    onStatus("Carregando modelo…");
+    const detector = await getDetector();
+    onStatus("Analisando corpo…");
+    const poses = await detector.estimatePoses(img);
+    if (!poses.length) return pixelFallback(img, cW, cH);
+    const kps: KP = {};
+    for (const kp of poses[0].keypoints) {
+      if (kp.name) kps[kp.name] = { x: kp.x, y: kp.y, score: kp.score ?? 0 };
+    }
+    return placementFromPose(kps, img, cW, cH);
+  } catch (err) {
+    console.warn("Pose detection failed, using fallback:", err);
+    detectorPromise = null; // reset so it can retry next time
+    return pixelFallback(img, cW, cH);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
 
 export default function Simulator() {
   const [selected, setSelected] = useState<(typeof flashItems)[0] | null>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [xf, setXf] = useState<TattooTransform>(INITIAL);
   const [dragging, setDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const draggingRef = useRef(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [page, setPage] = useState(0);
-  const [autoPlaced, setAutoPlaced] = useState(false);
+  const [detectMsg, setDetectMsg] = useState<string | null>(null);
   const [userMoved, setUserMoved] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -103,13 +176,13 @@ export default function Simulator() {
   const totalPages = Math.ceil(flashItems.length / perPage);
   const visible = flashItems.slice(page * perPage, page * perPage + perPage);
 
-  const runAutoPlace = useCallback((img: HTMLImageElement) => {
+  const runDetection = useCallback(async (img: HTMLImageElement) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    const placed = detectBodyPlacement(img, rect.width, rect.height);
-    setXf(placed);
-    setAutoPlaced(true);
+    if (!rect.width) return;
+    const result = await detectAndPlace(img, rect.width, rect.height, setDetectMsg);
+    setXf(result);
+    setDetectMsg(null);
     setUserMoved(false);
   }, []);
 
@@ -118,59 +191,60 @@ export default function Simulator() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const dataUrl = ev.target?.result as string;
-      setPhoto(dataUrl);
+      const url = ev.target?.result as string;
+      setPhoto(url);
       setStep(3);
       const img = new Image();
-      img.onload = () => { imgRef.current = img; runAutoPlace(img); };
-      img.src = dataUrl;
+      img.onload = () => { imgRef.current = img; runDetection(img); };
+      img.src = url;
     };
     reader.readAsDataURL(file);
-  }, [runAutoPlace]);
+  }, [runDetection]);
 
   const onSelect = (f: (typeof flashItems)[0]) => {
     setSelected(f);
-    if (imgRef.current && photo) {
-      runAutoPlace(imgRef.current);
-    } else {
-      setXf(INITIAL);
-      setAutoPlaced(false);
-    }
+    if (imgRef.current && photo) runDetection(imgRef.current);
+    else { setXf(INITIAL); setUserMoved(false); }
     setStep(photo ? 3 : 2);
   };
 
+  // ── drag — refs avoid stale-closure bug where first mousemove fires
+  // before React re-render would update the useCallback dependency ────
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    setDragging(true);
-    setUserMoved(true);
-    setDragStart({ x: e.clientX - xf.x, y: e.clientY - xf.y });
+    draggingRef.current = true;
+    dragStartRef.current = { x: e.clientX - xf.x, y: e.clientY - xf.y };
+    setDragging(true); setUserMoved(true);
   }, [xf.x, xf.y]);
 
   const onMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!dragging) return;
-    setXf(p => ({ ...p, x: e.clientX - dragStart.x, y: e.clientY - dragStart.y }));
-  }, [dragging, dragStart]);
+    if (!draggingRef.current) return;
+    const { x, y } = dragStartRef.current;
+    setXf(p => ({ ...p, x: e.clientX - x, y: e.clientY - y }));
+  }, []);
+
+  const stopDrag = useCallback(() => { draggingRef.current = false; setDragging(false); }, []);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     const t = e.touches[0];
-    setDragging(true);
-    setUserMoved(true);
-    setDragStart({ x: t.clientX - xf.x, y: t.clientY - xf.y });
+    draggingRef.current = true;
+    dragStartRef.current = { x: t.clientX - xf.x, y: t.clientY - xf.y };
+    setDragging(true); setUserMoved(true);
   }, [xf.x, xf.y]);
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!dragging) return;
+    if (!draggingRef.current) return;
     const t = e.touches[0];
-    setXf(p => ({ ...p, x: t.clientX - dragStart.x, y: t.clientY - dragStart.y }));
-  }, [dragging, dragStart]);
+    const { x, y } = dragStartRef.current;
+    setXf(p => ({ ...p, x: t.clientX - x, y: t.clientY - y }));
+  }, []);
 
   const onWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    setUserMoved(true);
+    e.preventDefault(); setUserMoved(true);
     setXf(p => ({ ...p, scale: Math.min(3, Math.max(0.3, p.scale - e.deltaY * 0.001)) }));
   }, []);
 
-  const showHint = selected && photo && autoPlaced && !userMoved;
+  const showHint = selected && photo && !detectMsg && !userMoved;
 
   return (
     <section id="simulador" className="py-24 lg:py-36 bg-paper-100">
@@ -196,7 +270,7 @@ export default function Simulator() {
             </h2>
           </div>
           <p className="text-ink-muted text-sm font-light leading-relaxed max-w-xs">
-            Escolha um flash, envie uma foto e a tatuagem se posiciona automaticamente. Tudo no browser, sem upload para servidores.
+            Selecione um flash, envie uma foto — a IA detecta o membro e encaixa automaticamente. 100% local, sem upload.
           </p>
         </motion.div>
 
@@ -249,15 +323,12 @@ export default function Simulator() {
                       <p className="text-[9px] tracking-widest text-ink-faint uppercase mt-0.5">{f.style}</p>
                       <p className="text-[10px] text-ink-muted leading-relaxed mt-1 line-clamp-2">{f.description}</p>
                     </div>
-                    {selected?.id === f.id && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-ink flex-shrink-0" />
-                    )}
+                    {selected?.id === f.id && <div className="w-1.5 h-1.5 rounded-full bg-ink flex-shrink-0" />}
                   </motion.button>
                 ))}
               </motion.div>
             </AnimatePresence>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center gap-2">
                 <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
@@ -283,11 +354,11 @@ export default function Simulator() {
               Sua foto não sai do navegador. Processamento 100% local.
             </p>
 
-            {/* Controls */}
+            {/* Manual controls */}
             {selected && photo && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 className="space-y-4 pt-5 border-t border-paper-300">
-                <p className="text-[9px] tracking-widest uppercase text-ink-faint">Ajustes Manuais</p>
+                <p className="text-[9px] tracking-widest uppercase text-ink-faint">Ajuste Fino</p>
 
                 <div className="flex items-center gap-2">
                   <span className="text-[9px] text-ink-faint w-14">Tamanho</span>
@@ -319,25 +390,25 @@ export default function Simulator() {
                 </div>
 
                 <button
-                  onClick={() => imgRef.current ? runAutoPlace(imgRef.current) : setXf(INITIAL)}
+                  onClick={() => imgRef.current && runDetection(imgRef.current)}
                   className="text-[9px] tracking-widest uppercase text-ink-faint hover:text-ink transition-colors flex items-center gap-1.5">
-                  <RotateCcw size={9} /> Reposicionar auto
+                  <RotateCcw size={9} /> Detectar novamente
                 </button>
               </motion.div>
             )}
           </div>
 
-          {/* Canvas */}
+          {/* Canvas area */}
           <div className="space-y-3">
             <div
               ref={containerRef}
               className="relative bg-paper-50 border border-paper-300 overflow-hidden select-none"
               style={{ aspectRatio: "4/3", minHeight: "360px" }}
               onMouseMove={onMouseMove}
-              onMouseUp={() => setDragging(false)}
-              onMouseLeave={() => setDragging(false)}
+              onMouseUp={stopDrag}
+              onMouseLeave={stopDrag}
               onTouchMove={onTouchMove}
-              onTouchEnd={() => setDragging(false)}
+              onTouchEnd={stopDrag}
               onWheel={onWheel}
             >
               {/* Body photo */}
@@ -359,17 +430,38 @@ export default function Simulator() {
                 </div>
               )}
 
-              {/* Tattoo overlay — outer wrapper animates opacity only,
-                  inner div owns the transform so dragging actually works
-                  (Framer Motion must not control `transform` here). */}
+              {/* AI detection status */}
               <AnimatePresence>
-                {selected && photo && (
+                {detectMsg && (
                   <motion.div
-                    key="tattoo-layer"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-paper-950/40 backdrop-blur-sm"
+                  >
+                    <div className="flex gap-1.5">
+                      {[0,1,2].map(i => (
+                        <motion.div key={i}
+                          className="w-1.5 h-1.5 rounded-full bg-paper-100"
+                          animate={{ opacity: [0.3, 1, 0.3] }}
+                          transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.2 }}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-paper-200 text-[10px] tracking-widest uppercase">{detectMsg}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Tattoo overlay */}
+              <AnimatePresence>
+                {selected && photo && !detectMsg && (
+                  <motion.div
+                    key="tattoo-wrapper"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
                     className="absolute inset-0 z-10 pointer-events-none"
                   >
                     <div
@@ -378,7 +470,7 @@ export default function Simulator() {
                         left: "50%",
                         top: "50%",
                         transform: `translate(calc(-50% + ${xf.x}px), calc(-50% + ${xf.y}px)) scale(${xf.scale}) rotate(${xf.rotation}deg)`,
-                        transition: dragging ? "none" : "transform 0.25s cubic-bezier(0.22,1,0.36,1)",
+                        transition: dragging ? "none" : "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
                         touchAction: "none",
                       }}
                       onMouseDown={onMouseDown}
@@ -389,34 +481,27 @@ export default function Simulator() {
                         alt={selected.name}
                         className="select-none pointer-events-none block"
                         style={{
-                          width: `${TATTOO_BASE_PX}px`,
+                          width: `${BASE_PX}px`,
                           height: "auto",
-                          // Multiply lets the skin texture/shadows show through the ink;
-                          // soft blur + grain mask kill the flat "sticker" edge.
                           mixBlendMode: "multiply",
                           filter: "contrast(1.1) brightness(1.02) blur(0.4px) sepia(0.1)",
                           opacity: 0.82,
-                          WebkitMaskImage:
-                            "radial-gradient(ellipse 92% 92% at 50% 50%, #000 78%, transparent 100%)",
-                          maskImage:
-                            "radial-gradient(ellipse 92% 92% at 50% 50%, #000 78%, transparent 100%)",
+                          WebkitMaskImage: "radial-gradient(ellipse 94% 94% at 50% 50%, #000 72%, transparent 100%)",
+                          maskImage: "radial-gradient(ellipse 94% 94% at 50% 50%, #000 72%, transparent 100%)",
                         }}
                         draggable={false}
                       />
-                      {/* Hint: only visible before user interacts */}
                       <AnimatePresence>
                         {showHint && (
-                          <motion.div
+                          <motion.p
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            transition={{ delay: 0.5 }}
-                            className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none"
+                            transition={{ delay: 0.6 }}
+                            className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[8px] text-ink-muted tracking-wider bg-paper-50/80 px-2 py-0.5 pointer-events-none"
                           >
-                            <p className="text-[8px] text-ink-muted tracking-wider bg-paper-50/70 px-2 py-0.5">
-                              Encaixada · arraste para ajustar
-                            </p>
-                          </motion.div>
+                            Encaixada · arraste para ajustar
+                          </motion.p>
                         )}
                       </AnimatePresence>
                     </div>
@@ -424,17 +509,18 @@ export default function Simulator() {
                 )}
               </AnimatePresence>
 
-              {/* Clear photo */}
+              {/* Clear */}
               {photo && (
-                <button onClick={() => { setPhoto(null); imgRef.current = null; setAutoPlaced(false); setStep(selected ? 2 : 1); }}
-                  className="absolute top-3 right-3 z-20 p-1.5 bg-paper-50/80 border border-paper-300 text-ink-muted hover:text-ink transition-colors">
+                <button
+                  onClick={() => { setPhoto(null); imgRef.current = null; setDetectMsg(null); setStep(selected ? 2 : 1); }}
+                  className="absolute top-3 right-3 z-30 p-1.5 bg-paper-50/80 border border-paper-300 text-ink-muted hover:text-ink transition-colors">
                   <X size={11} />
                 </button>
               )}
             </div>
 
             <p className="text-[9px] text-ink-faint">
-              {selected && photo ? "Scroll → tamanho · Arraste → posição · Botões → rotação" : ""}
+              {selected && photo && !detectMsg ? "Scroll → tamanho · Arraste → posição · Botões → rotação" : ""}
             </p>
 
             <AnimatePresence>
