@@ -117,10 +117,6 @@ export default function Simulator() {
     setTransform((prev) => ({ ...prev, rotation: prev.rotation + delta }));
   };
 
-  const quoteMessage = selectedFlash
-    ? `Olá! Vim do Simulador Virtual e gostei do flash "${selectedFlash.name}". Gostaria de um orçamento.`
-    : "";
-
   return (
     <section id="simulador" className="py-24 lg:py-32 bg-ink-900">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -210,10 +206,13 @@ export default function Simulator() {
                     <div className="w-14 h-14 lg:w-16 lg:h-16 flex-shrink-0 bg-ink-800 flex items-center justify-center text-2xl lg:text-3xl rounded-sm overflow-hidden">
                       {flash.placeholder}
                     </div>
-                    <div className="hidden lg:block">
+                    <div className="hidden lg:block flex-1 min-w-0">
                       <p className="text-sm text-ink-200 font-light">{flash.name}</p>
-                      <p className="text-[10px] tracking-wider text-ink-500 uppercase mt-0.5">
+                      <p className="text-[10px] tracking-wider text-ink-500 uppercase mt-0.5 mb-1">
                         {flash.style}
+                      </p>
+                      <p className="text-[10px] text-ink-600 leading-relaxed line-clamp-2">
+                        {flash.description}
                       </p>
                     </div>
                     {selectedFlash?.id === flash.id && (

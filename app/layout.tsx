@@ -17,13 +17,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Prestes Studio — Tatuagens Autorais",
+  title: "Bruno Belt — Tatuagens Neo-Geométricas e Clássicas",
   description:
-    "Arte exclusiva na pele. Tatuagens autorais de alto padrão. Agende sua consulta e explore o simulador virtual de flash tattoos.",
-  keywords: "tatuagem, tattoo, flash tattoo, tatuagem autoral, estúdio de tatuagem",
+    "Arte neo-geométrica, clássica e colagem surrealista na pele. Bruno Beltrami — tatuagens autorais de alto padrão em Santa Catarina.",
+  keywords: "tatuagem, neo-geométrico, blackwork, tatuagem clássica, flash tattoo, Bruno Beltrami, Bruno Belt",
   openGraph: {
-    title: "Prestes Studio — Tatuagens Autorais",
-    description: "Arte exclusiva na pele. Tatuagens autorais de alto padrão.",
+    title: "Bruno Belt — Tatuagens Neo-Geométricas e Clássicas",
+    description: "Arte neo-geométrica, clássica e colagem surrealista na pele.",
     type: "website",
   },
 };

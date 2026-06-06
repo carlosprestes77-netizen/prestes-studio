@@ -7,19 +7,19 @@ const values = [
     number: "01",
     title: "Arte Autoral",
     description:
-      "Cada peça é concebida como uma obra única. Não faço réplicas — adapto referências em linguagem própria.",
+      "Cada peça nasce de uma linguagem própria — a fusão de realismo, geometria sagrada e colagem surrealista. Não há cópias aqui.",
   },
   {
     number: "02",
     title: "Higiene Total",
     description:
-      "Autoclave, materiais descartáveis e protocolo rigoroso. Seu corpo merece o mesmo cuidado que a arte.",
+      "Autoclave, materiais descartáveis e protocolo rigoroso. Seu corpo merece o mesmo cuidado que a arte impressa nele.",
   },
   {
     number: "03",
     title: "Acompanhamento",
     description:
-      "Suporte completo na cicatrização. Retoques inclusos nos primeiros 60 dias sem custo adicional.",
+      "Suporte completo na cicatrização e retoques inclusos nos primeiros 60 dias. A relação não termina na sessão.",
   },
 ];
 
@@ -39,7 +39,7 @@ export default function Studio() {
             <div className="relative aspect-[3/4] overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1621111848501-8d3634f82336?w=900&q=85"
-                alt="Estúdio de tatuagem"
+                alt="Bruno Beltrami tatuando"
                 className="w-full h-full object-cover grayscale-[30%]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-ink-950/60 to-transparent" />
@@ -57,7 +57,7 @@ export default function Studio() {
             </motion.div>
             <div className="absolute top-6 left-6 border border-gold/30 p-3">
               <p className="text-[9px] tracking-[0.4em] text-gold uppercase">
-                São Paulo · SP
+                Bruno Beltrami · SC
               </p>
             </div>
           </motion.div>
@@ -88,9 +88,9 @@ export default function Studio() {
               transition={{ duration: 0.7, delay: 0.2 }}
               className="text-ink-400 text-sm leading-relaxed"
             >
-              Há mais de 8 anos transformando pele em tela. Especializado em
-              Fineline, Blackwork e Ornamental, cada sessão começa com uma
-              conversa honesta sobre o que você quer carregar para sempre.
+              Bruno Beltrami une realismo detalhado com estruturas geométricas
+              e referências clássicas — greco-romanas, maçônicas, da natureza.
+              Um estilo inconfundível que transforma a pele em composição.
             </motion.p>
 
             {/* Values */}

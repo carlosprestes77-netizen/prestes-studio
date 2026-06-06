@@ -37,10 +37,10 @@ export default function Navbar() {
           {/* Logo */}
           <a href="#" className="group flex flex-col leading-none">
             <span className="font-serif text-xl lg:text-2xl font-light text-ink-100 tracking-wider group-hover:text-gold transition-colors duration-300">
-              PRESTES
+              BRUNO BELT
             </span>
             <span className="text-[9px] tracking-[0.35em] text-gold uppercase font-light">
-              Studio
+              Tattoo Studio
             </span>
           </a>
 

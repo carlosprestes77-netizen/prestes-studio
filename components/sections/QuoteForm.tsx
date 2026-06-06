@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Upload, Send, CheckCircle } from "lucide-react";
+import { Upload, CheckCircle, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ARTIST } from "@/lib/data";
 
 interface FormData {
   name: string;
-  email: string;
   whatsapp: string;
   description: string;
   placement: string;
@@ -99,10 +99,26 @@ function FloatingTextarea({
   );
 }
 
+function buildWhatsAppMessage(form: FormData): string {
+  const lines: string[] = [
+    `Olá Bruno! Vim pelo site e quero solicitar um orçamento. 🖤`,
+    ``,
+    `*Nome:* ${form.name}`,
+    form.whatsapp ? `*Meu WhatsApp:* ${form.whatsapp}` : "",
+    form.selectedFlash ? `*Flash do Simulador:* ${form.selectedFlash}` : "",
+    form.placement ? `*Local do corpo:* ${form.placement}` : "",
+    form.size ? `*Tamanho:* ${form.size}` : "",
+    ``,
+    `*Ideia / Descrição:*`,
+    form.description || "(sem descrição)",
+  ];
+
+  return lines.filter((l) => l !== undefined).join("\n");
+}
+
 export default function QuoteForm() {
   const [form, setForm] = useState<FormData>({
     name: "",
-    email: "",
     whatsapp: "",
     description: "",
     placement: "",
@@ -131,25 +147,29 @@ export default function QuoteForm() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setForm((prev) => ({
-        ...prev,
-        references: Array.from(e.target.files!),
-      }));
+      setForm((prev) => ({ ...prev, references: Array.from(e.target.files!) }));
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In production: send to API / WhatsApp / email
+    const message = buildWhatsAppMessage(form);
+    const url = `https://wa.me/${ARTIST.whatsapp}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
     setSubmitted(true);
   };
 
   const placements = [
     "Antebraço", "Braço", "Ombro", "Costela", "Perna",
-    "Tornozelo", "Pé", "Pescoço", "Costas", "Outro"
+    "Tornozelo", "Pé", "Pescoço", "Costas", "Outro",
   ];
 
-  const sizes = ["Pequeno (até 5cm)", "Médio (5–10cm)", "Grande (10–20cm)", "Full piece (+20cm)"];
+  const sizes = [
+    "Pequeno (até 5cm)",
+    "Médio (5–10cm)",
+    "Grande (10–20cm)",
+    "Full piece (+20cm)",
+  ];
 
   return (
     <section id="orcamento" className="py-24 lg:py-32 bg-ink-900">
@@ -176,15 +196,14 @@ export default function QuoteForm() {
             </div>
 
             <p className="text-ink-400 text-sm leading-relaxed">
-              Preencha o formulário com o máximo de detalhes possível.
-              Respondemos todas as solicitações em até{" "}
-              <strong className="text-ink-300">48 horas</strong>, priorizando
-              projetos alinhados com o nosso estilo.
+              Preencha os dados abaixo. Ao enviar, você será direcionado para o
+              WhatsApp do Bruno com uma mensagem já formatada — sem copiar e
+              colar nada.
             </p>
 
             <div className="space-y-4">
               {[
-                "Projetos autorais têm prioridade",
+                "Projetos com identidade própria têm prioridade",
                 "Orçamento sem compromisso",
                 "Sessão de briefing gratuita",
                 "Retoques inclusos nos primeiros 60 dias",
@@ -196,10 +215,26 @@ export default function QuoteForm() {
               ))}
             </div>
 
-            {/* Decorative line */}
-            <div className="pt-8 border-t border-ink-800">
-              <p className="font-serif text-2xl text-ink-700 italic">
-                "Tatuagens não são sobre o tatuador.<br />
+            {/* WhatsApp direct link */}
+            <div className="pt-4 border-t border-ink-800">
+              <p className="text-[10px] text-ink-600 mb-3 tracking-wider uppercase">
+                Ou fale diretamente
+              </p>
+              <a
+                href={`https://wa.me/${ARTIST.whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 py-3 px-6 bg-[#25D366]/10 border border-[#25D366]/30 text-[#25D366] text-xs tracking-widest uppercase hover:bg-[#25D366]/20 transition-all duration-300"
+              >
+                <MessageCircle size={14} />
+                Abrir WhatsApp
+              </a>
+            </div>
+
+            <div className="pt-4 border-t border-ink-800">
+              <p className="font-serif text-2xl text-ink-700 italic leading-snug">
+                "Tatuagens não são sobre o tatuador.
+                <br />
                 São sobre quem as carrega."
               </p>
             </div>
@@ -223,12 +258,19 @@ export default function QuoteForm() {
                 </div>
                 <div>
                   <h3 className="font-serif text-3xl text-ink-100 mb-2">
-                    Mensagem Enviada
+                    WhatsApp Aberto!
                   </h3>
-                  <p className="text-ink-500 text-sm">
-                    Retornaremos em até 48h. Obrigado pelo interesse.
+                  <p className="text-ink-500 text-sm max-w-xs mx-auto leading-relaxed">
+                    A mensagem já está formatada. Só enviar e aguardar o retorno
+                    do Bruno. 🖤
                   </p>
                 </div>
+                <button
+                  onClick={() => setSubmitted(false)}
+                  className="text-[10px] tracking-widest uppercase text-ink-600 hover:text-gold transition-colors"
+                >
+                  Preencher novamente
+                </button>
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -242,33 +284,24 @@ export default function QuoteForm() {
                   </div>
                 )}
 
-                <div className="grid sm:grid-cols-2 gap-8">
-                  <FloatingInput
-                    label="Nome completo"
-                    name="name"
-                    value={form.name}
-                    onChange={setField("name")}
-                  />
-                  <FloatingInput
-                    label="E-mail"
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={setField("email")}
-                  />
-                </div>
+                <FloatingInput
+                  label="Seu nome"
+                  name="name"
+                  value={form.name}
+                  onChange={setField("name")}
+                />
 
                 <FloatingInput
-                  label="WhatsApp"
+                  label="Seu WhatsApp (para retorno)"
                   name="whatsapp"
                   type="tel"
                   value={form.whatsapp}
                   onChange={setField("whatsapp")}
-                  placeholder="(11) 99999-9999"
+                  placeholder="(48) 99999-9999"
                 />
 
                 <FloatingTextarea
-                  label="Descrição da ideia"
+                  label="Descreva sua ideia"
                   name="description"
                   value={form.description}
                   onChange={setField("description")}
@@ -325,7 +358,8 @@ export default function QuoteForm() {
                 {/* References upload */}
                 <div className="space-y-3">
                   <label className="text-[10px] tracking-widest uppercase text-gold">
-                    Imagens de referência
+                    Imagens de referência{" "}
+                    <span className="text-ink-700 normal-case tracking-normal">(opcional)</span>
                   </label>
                   <button
                     type="button"
@@ -334,8 +368,8 @@ export default function QuoteForm() {
                   >
                     <Upload size={14} />
                     {form.references.length > 0
-                      ? `${form.references.length} arquivo(s) selecionado(s)`
-                      : "Adicionar referências"}
+                      ? `${form.references.length} arquivo(s) — envie pelo WhatsApp`
+                      : "Selecionar imagens"}
                   </button>
                   <input
                     ref={fileRef}
@@ -345,15 +379,25 @@ export default function QuoteForm() {
                     className="hidden"
                     onChange={handleFileChange}
                   />
+                  {form.references.length > 0 && (
+                    <p className="text-[10px] text-ink-600">
+                      As imagens serão enviadas separadamente no WhatsApp após abrir a conversa.
+                    </p>
+                  )}
                 </div>
 
                 <button
                   type="submit"
-                  className="btn-primary w-full justify-center gap-3"
+                  disabled={!form.name.trim()}
+                  className="btn-primary w-full justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Enviar solicitação
-                  <Send size={14} />
+                  <MessageCircle size={14} />
+                  Enviar via WhatsApp
                 </button>
+
+                <p className="text-[10px] text-ink-700 text-center">
+                  Ao clicar, o WhatsApp abre com sua mensagem já formatada.
+                </p>
               </form>
             )}
           </motion.div>

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { portfolioItems } from "@/lib/data";
 
-const filters = ["Todos", "Fineline", "Blackwork", "Ornamental", "Geometric"];
+const filters = ["Todos", "Neo-Geométrico", "Collage", "Neo-Clássico", "Surrealista"];
 
 export default function Portfolio() {
   const [active, setActive] = useState("Todos");
