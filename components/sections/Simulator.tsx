@@ -359,53 +359,67 @@ export default function Simulator() {
                 </div>
               )}
 
-              {/* Tattoo overlay */}
+              {/* Tattoo overlay — outer wrapper animates opacity only,
+                  inner div owns the transform so dragging actually works
+                  (Framer Motion must not control `transform` here). */}
               <AnimatePresence>
                 {selected && photo && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    key="tattoo-layer"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    className={`absolute z-10 ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
-                    style={{
-                      left: "50%",
-                      top: "50%",
-                      transform: `translate(calc(-50% + ${xf.x}px), calc(-50% + ${xf.y}px)) scale(${xf.scale}) rotate(${xf.rotation}deg)`,
-                      touchAction: "none",
-                    }}
-                    onMouseDown={onMouseDown}
-                    onTouchStart={onTouchStart}
+                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-0 z-10 pointer-events-none"
                   >
-                    <img
-                      src={selected.simSrc}
-                      alt={selected.name}
-                      className="select-none pointer-events-none block"
+                    <div
+                      className={`absolute pointer-events-auto ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
                       style={{
-                        width: `${TATTOO_BASE_PX}px`,
-                        height: "auto",
-                        mixBlendMode: "multiply",
-                        filter: "contrast(1.12) blur(0.3px) sepia(0.08)",
-                        opacity: 0.9,
+                        left: "50%",
+                        top: "50%",
+                        transform: `translate(calc(-50% + ${xf.x}px), calc(-50% + ${xf.y}px)) scale(${xf.scale}) rotate(${xf.rotation}deg)`,
+                        transition: dragging ? "none" : "transform 0.25s cubic-bezier(0.22,1,0.36,1)",
+                        touchAction: "none",
                       }}
-                      draggable={false}
-                    />
-                    {/* Hint: only visible before user interacts */}
-                    <AnimatePresence>
-                      {showHint && (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ delay: 0.5 }}
-                          className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none"
-                        >
-                          <p className="text-[8px] text-ink-muted tracking-wider bg-paper-50/70 px-2 py-0.5">
-                            Auto-posicionado · arraste para ajustar
-                          </p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                      onMouseDown={onMouseDown}
+                      onTouchStart={onTouchStart}
+                    >
+                      <img
+                        src={selected.simSrc}
+                        alt={selected.name}
+                        className="select-none pointer-events-none block"
+                        style={{
+                          width: `${TATTOO_BASE_PX}px`,
+                          height: "auto",
+                          // Multiply lets the skin texture/shadows show through the ink;
+                          // soft blur + grain mask kill the flat "sticker" edge.
+                          mixBlendMode: "multiply",
+                          filter: "contrast(1.1) brightness(1.02) blur(0.4px) sepia(0.1)",
+                          opacity: 0.82,
+                          WebkitMaskImage:
+                            "radial-gradient(ellipse 92% 92% at 50% 50%, #000 78%, transparent 100%)",
+                          maskImage:
+                            "radial-gradient(ellipse 92% 92% at 50% 50%, #000 78%, transparent 100%)",
+                        }}
+                        draggable={false}
+                      />
+                      {/* Hint: only visible before user interacts */}
+                      <AnimatePresence>
+                        {showHint && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ delay: 0.5 }}
+                            className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none"
+                          >
+                            <p className="text-[8px] text-ink-muted tracking-wider bg-paper-50/70 px-2 py-0.5">
+                              Encaixada · arraste para ajustar
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
