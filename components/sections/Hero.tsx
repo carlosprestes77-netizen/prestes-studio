@@ -6,7 +6,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
   const textY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
@@ -14,20 +14,38 @@ export default function Hero() {
     <section
       ref={ref}
       id="hero"
-      className="relative min-h-screen flex items-end pb-20 lg:pb-28 overflow-hidden bg-paper-200"
+      className="relative min-h-screen flex items-end pb-20 lg:pb-28 overflow-hidden bg-paper-900"
     >
-      {/* Full-bleed background image */}
+      {/* Background image */}
       <motion.div style={{ y: imgY }} className="absolute inset-0 z-0">
         <div
           className="absolute inset-0 bg-cover bg-center scale-110"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?w=1920&q=85')`,
+            backgroundImage: `url('https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?w=1920&q=90')`,
           }}
         />
-        {/* Light-mode overlay: paper tone bleed from bottom */}
-        <div className="absolute inset-0 bg-gradient-to-t from-paper-200 via-paper-200/60 to-paper-200/20" />
-        <div className="absolute inset-0 bg-gradient-to-r from-paper-200/50 via-transparent to-paper-200/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-paper-950/95 via-paper-950/55 to-paper-950/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-paper-950/70 via-transparent to-transparent" />
       </motion.div>
+
+      {/* Decorative Latin — large ghost text */}
+      <div
+        className="absolute inset-0 z-0 flex items-center justify-end pr-8 lg:pr-20 pointer-events-none select-none overflow-hidden"
+        aria-hidden
+      >
+        <p
+          className="font-serif text-paper-100 leading-none"
+          style={{
+            fontSize: "clamp(6rem, 18vw, 18rem)",
+            opacity: 0.04,
+            letterSpacing: "0.06em",
+            writingMode: "vertical-rl",
+            transform: "rotate(180deg)",
+          }}
+        >
+          VINCIT
+        </p>
+      </div>
 
       {/* Content */}
       <motion.div
@@ -35,77 +53,85 @@ export default function Hero() {
         className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-16"
       >
         <div className="max-w-3xl">
-          {/* Eyebrow */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="label-section mb-6"
+            className="text-[9px] tracking-[0.5em] uppercase font-sans font-light text-paper-500 mb-6"
           >
-            Arte Autoral · Santa Catarina
+            Microrealismo · Geometria Sagrada · Santa Catarina
           </motion.p>
 
-          {/* Title — editorial, large, serif */}
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="font-serif font-light leading-[0.9] tracking-tight text-ink"
-            style={{ fontSize: "clamp(3.5rem, 9vw, 8rem)" }}
+            className="font-serif leading-[0.88] tracking-tight text-paper-100"
+            style={{ fontSize: "clamp(3.8rem, 10vw, 9rem)", fontWeight: 700 }}
           >
-            A Arte
+            Arte
             <br />
-            <em className="not-italic text-ink-muted">na Pele,</em>
+            <span className="font-light italic text-paper-300" style={{ fontWeight: 300 }}>
+              gravada
+            </span>
             <br />
-            Elevada.
+            para sempre.
           </motion.h1>
 
-          {/* Thin divider */}
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
-            className="origin-left w-20 h-px bg-ink-muted mt-8 mb-8"
+            className="origin-left w-16 h-px bg-paper-600 mt-8 mb-7"
           />
 
-          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
-            className="text-ink-muted text-sm font-light leading-relaxed max-w-sm mb-10"
+            className="text-paper-400 text-sm font-light leading-relaxed max-w-sm mb-3 font-serif italic"
           >
-            Tatuagens neo-geométricas e clássicas
-            concebidas como obras permanentes.
-            Cada composição, uma assinatura.
+            "Entre o sagrado e a razão — um diálogo entre fé, tempo e memória."
           </motion.p>
 
-          {/* CTAs */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.25 }}
+            className="text-paper-600 text-[10px] tracking-widest uppercase mb-10"
+          >
+            Bruno Beltrami
+          </motion.p>
+
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 1.2 }}
+            transition={{ duration: 0.7, delay: 1.3 }}
             className="flex flex-wrap gap-3"
           >
             <a href="#simulador" className="btn-primary">
-              Testar Simulador Virtual
+              Simulador Virtual
             </a>
-            <a href="#portfolio" className="btn-outline">
+            <a
+              href="#portfolio"
+              className="relative inline-flex items-center gap-2 px-8 py-3.5 border border-paper-700 text-paper-300 font-sans font-medium tracking-widest text-[10px] uppercase transition-all duration-300 hover:border-paper-400 hover:text-paper-100"
+            >
               Ver Portfólio
             </a>
           </motion.div>
         </div>
       </motion.div>
 
-      {/* Right side — vertical label */}
+      {/* Right vertical label */}
       <div className="absolute right-6 top-1/2 -translate-y-1/2 hidden lg:flex flex-col items-center gap-3 z-10">
-        <div className="w-px h-12 bg-paper-400" />
+        <div className="w-px h-12 bg-paper-700" />
         <p
-          className="text-ink-faint text-[8px] tracking-[0.4em] uppercase"
+          className="text-paper-700 text-[8px] tracking-[0.4em] uppercase"
           style={{ writingMode: "vertical-rl" }}
         >
           @bruno.belt
         </p>
+        <div className="w-px h-12 bg-paper-700" />
       </div>
     </section>
   );
