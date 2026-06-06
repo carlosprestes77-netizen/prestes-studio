@@ -1,11 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { ARTIST } from "@/lib/data";
 
 const values = [
-  { n: "01", title: "Arte Autoral", desc: "Cada peça nasce de uma linguagem própria — fusão de realismo, geometria sagrada e colagem surrealista. Não há cópias." },
-  { n: "02", title: "Higiene Total", desc: "Autoclave, materiais descartáveis e protocolo rigoroso. Seu corpo merece o mesmo cuidado que a arte impressa nele." },
-  { n: "03", title: "Acompanhamento", desc: "Suporte completo na cicatrização e retoques inclusos nos primeiros 60 dias. A relação não termina na sessão." },
+  { n: "I", title: "Microrealismo + Geometria", desc: "Cada composição une realismo fotográfico com geometria sagrada — proporções matemáticas, órbitas, constelações. Uma linguagem única." },
+  { n: "II", title: "Narrativa Visual", desc: "Figuras greco-romanas, latim clássico, símbolos maçônicos. Conceito contado através de uma narrativa visual construída para durar." },
+  { n: "III", title: "Vínculo Permanente", desc: "Acompanhamento completo na cicatrização. Retoques inclusos nos primeiros 60 dias. A relação não termina quando a agulha para." },
 ];
 
 export default function Studio() {
@@ -22,11 +23,11 @@ export default function Studio() {
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             className="relative"
           >
-            <div className="relative aspect-[3/4] overflow-hidden">
+            <div className="relative aspect-[3/4] overflow-hidden bg-paper-300">
               <img
-                src="https://images.unsplash.com/photo-1621111848501-8d3634f82336?w=900&q=85"
-                alt="Bruno Beltrami"
-                className="w-full h-full object-cover grayscale-[20%]"
+                src={ARTIST.portrait}
+                alt="Bruno Beltrami no estúdio"
+                className="w-full h-full object-cover object-top"
               />
             </div>
             {/* Offset label card */}
@@ -37,8 +38,8 @@ export default function Studio() {
               transition={{ delay: 0.4 }}
               className="absolute -bottom-6 -right-4 lg:-right-8 bg-ink text-paper-100 p-6"
             >
-              <p className="font-serif text-3xl text-paper-100">+500</p>
-              <p className="text-[9px] tracking-widest text-paper-400 uppercase mt-1">Trabalhos realizados</p>
+              <p className="font-serif text-3xl text-paper-100 font-bold">+500</p>
+              <p className="text-[9px] tracking-widest text-paper-500 uppercase mt-1">Peças realizadas</p>
             </motion.div>
           </motion.div>
 
@@ -52,29 +53,30 @@ export default function Studio() {
             >
               <p className="label-section mb-4">03 — O Artista</p>
               <h2
-                className="font-serif font-light leading-[0.95] tracking-tight text-ink"
-                style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
+                className="font-serif leading-[0.92] tracking-tight text-ink"
+                style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", fontWeight: 700 }}
               >
                 Onde Cada
                 <br />
-                Linha Tem
+                <span className="font-light italic" style={{ fontWeight: 300 }}>Linha Tem</span>
                 <br />
-                Intenção
+                Intenção.
               </h2>
               <div className="divider mt-6" />
             </motion.div>
 
-            <motion.p
+            <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-ink-muted text-sm leading-relaxed"
+              className="space-y-3"
             >
-              Bruno Beltrami une realismo detalhado com estruturas geométricas
-              e referências clássicas — greco-romanas, maçônicas, da natureza.
-              Um estilo inconfundível que transforma a pele em composição.
-            </motion.p>
+              <p className="text-ink-muted text-sm leading-relaxed">
+                Bruno Beltrami é especialista em microrealismo com geometria — figuras greco-romanas, latim clássico e estruturas matemáticas que transformam a pele em composição permanente.
+              </p>
+              <p className="text-ink-faint text-xs tracking-wider uppercase">Florianópolis · Santa Catarina</p>
+            </motion.div>
 
             <div className="space-y-7">
               {values.map((v, i) => (
@@ -86,7 +88,7 @@ export default function Studio() {
                   transition={{ duration: 0.6, delay: i * 0.1 }}
                   className="flex gap-6 pb-7 border-b border-paper-300 last:border-0 last:pb-0"
                 >
-                  <span className="text-[9px] text-ink-faint font-mono mt-0.5 flex-shrink-0">{v.n}</span>
+                  <span className="font-serif text-xs text-ink-faint mt-0.5 flex-shrink-0 w-4">{v.n}</span>
                   <div>
                     <h4 className="font-serif text-lg text-ink mb-1">{v.title}</h4>
                     <p className="text-ink-muted text-sm leading-relaxed">{v.desc}</p>
@@ -94,6 +96,14 @@ export default function Studio() {
                 </motion.div>
               ))}
             </div>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="font-serif text-lg text-ink-muted italic leading-snug pt-4 border-t border-paper-300"
+            >
+              "Algumas decisões na vida são como um código — você analisa, calcula, mas em algum momento precisa confiar no instinto."
+            </motion.p>
           </div>
         </div>
       </div>

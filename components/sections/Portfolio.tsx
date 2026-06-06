@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { portfolioItems } from "@/lib/data";
 
 const filters = ["Todos", "Neo-Geométrico", "Collage", "Neo-Clássico"];
 
+type PortfolioItem = typeof portfolioItems[0] & { label?: string };
+
 export default function Portfolio() {
   const [active, setActive] = useState("Todos");
 
-  const filtered =
+  const filtered: PortfolioItem[] =
     active === "Todos" ? portfolioItems : portfolioItems.filter((i) => i.style === active);
 
   return (
@@ -71,18 +72,24 @@ export default function Portfolio() {
                   item.size === "large" ? "aspect-[3/4]" : item.size === "small" ? "aspect-square" : "aspect-[4/5]"
                 }`}
               >
-                <Image
+                <img
                   src={item.src}
                   alt={item.alt}
-                  fill
-                  className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-[1.04] transition-all duration-700 ease-out"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-[1.04] transition-all duration-700 ease-out"
                 />
-                {/* Hover info */}
-                <div className="absolute inset-0 bg-gradient-to-t from-paper-950/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-400">
-                  <p className="text-[9px] tracking-widest uppercase text-paper-300 mb-0.5">{item.style}</p>
-                  <p className="font-serif text-base text-paper-100">{item.alt}</p>
+                {/* Always-visible gradient + label */}
+                <div className="absolute inset-0 bg-gradient-to-t from-paper-950/80 via-paper-950/20 to-transparent" />
+                {item.label && (
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <p className="text-[8px] tracking-[0.4em] uppercase text-paper-500 mb-1">{item.style} · {item.placement}</p>
+                    <p className="font-serif text-sm font-semibold tracking-wider text-paper-100">{item.label}</p>
+                  </div>
+                )}
+                {/* Hover detail */}
+                <div className="absolute inset-0 bg-paper-950/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <p className="text-[8px] tracking-widest uppercase text-paper-300 bg-paper-950/60 px-2 py-1">{item.style}</p>
                 </div>
               </div>
             </motion.div>

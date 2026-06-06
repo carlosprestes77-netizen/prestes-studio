@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 const links = [
   { label: "Portfólio", href: "#portfolio" },
+  { label: "Flashes", href: "#flashes" },
   { label: "Simulador", href: "#simulador" },
   { label: "O Artista", href: "#estudio" },
   { label: "Orçamento", href: "#orcamento" },
