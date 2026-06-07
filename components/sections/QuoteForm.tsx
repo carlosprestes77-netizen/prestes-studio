@@ -72,9 +72,29 @@ export default function QuoteForm() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.split("?")[1] || "");
-    const flash = params.get("flash");
-    if (flash) setForm(p => ({ ...p, selectedFlash: flash, description: `Flash do Simulador: "${flash}". ` }));
+    // Reads the flash chosen in the Simulator from the URL hash and pre-fills
+    // the form. Runs on mount AND on every hashchange, so clicking "Quero essa
+    // tatuagem" updates the form even when the page is already loaded.
+    const applyFlash = () => {
+      const params = new URLSearchParams(window.location.hash.split("?")[1] || "");
+      const flash = params.get("flash");
+      if (!flash) return;
+      setForm(p => ({
+        ...p,
+        selectedFlash: flash,
+        // Only seed the description if the user hasn't written their own yet.
+        description: p.description.trim() === "" || p.description.startsWith("Quero a tatuagem")
+          ? `Quero a tatuagem "${flash}" que vi no simulador. `
+          : p.description,
+      }));
+      // Briefly focus the form so the user knows where to continue.
+      requestAnimationFrame(() => {
+        document.getElementById("orcamento")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    };
+    applyFlash();
+    window.addEventListener("hashchange", applyFlash);
+    return () => window.removeEventListener("hashchange", applyFlash);
   }, []);
 
   const set = (f: keyof FormData) => (v: string) => setForm(p => ({ ...p, [f]: v }));

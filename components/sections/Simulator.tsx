@@ -5,8 +5,31 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload, RotateCcw, ZoomIn, ZoomOut,
   ChevronLeft, ChevronRight, ArrowRight, X,
+  MessageCircle, CheckCircle, Send,
 } from "lucide-react";
-import { flashItems } from "@/lib/data";
+import { flashItems, ARTIST } from "@/lib/data";
+import { cn } from "@/lib/utils";
+
+const PLACEMENTS = ["Antebraço","Braço","Ombro","Costela","Perna","Tornozelo","Pescoço","Costas","Mão","Outro"];
+const SIZES      = ["Pequeno (até 5 cm)","Médio (5–10 cm)","Grande (10–20 cm)","Full piece (+20 cm)"];
+
+interface BookingForm { name: string; phone: string; placement: string; size: string; notes: string }
+const BOOKING_EMPTY: BookingForm = { name:"", phone:"", placement:"", size:"", notes:"" };
+
+function buildWhatsApp(flash: { name: string; style: string }, b: BookingForm) {
+  const msg = [
+    `Olá Bruno! Vi o simulador do site e quero fazer essa tatuagem. 🖤`,
+    ``,
+    `*Flash escolhido:* ${flash.name} (${flash.style})`,
+    b.placement ? `*Local no corpo:* ${b.placement}` : null,
+    b.size      ? `*Tamanho:* ${b.size}` : null,
+    ``,
+    `*Meu nome:* ${b.name}`,
+    b.phone     ? `*Meu WhatsApp:* ${b.phone}` : null,
+    b.notes     ? `*Observações:* ${b.notes}` : null,
+  ].filter((l): l is string => l !== null).join("\n");
+  return `https://wa.me/${ARTIST.whatsapp}?text=${encodeURIComponent(msg)}`;
+}
 
 interface TattooTransform { x: number; y: number; scale: number; rotation: number }
 const INITIAL: TattooTransform = { x: 0, y: 0, scale: 1, rotation: 0 };
@@ -150,6 +173,9 @@ export default function Simulator() {
   const [page, setPage] = useState(0);
   const [detecting, setDetecting] = useState(false);
   const [userMoved, setUserMoved] = useState(false);
+  const [showBooking, setShowBooking] = useState(false);
+  const [bookingForm, setBookingForm] = useState<BookingForm>(BOOKING_EMPTY);
+  const [bookingDone, setBookingDone] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -189,8 +215,10 @@ export default function Simulator() {
 
   const onSelect = useCallback((f: (typeof flashItems)[0]) => {
     setSelected(f);
-    // Start processing immediately, show original until ready
     setProcessedSrc(null);
+    setShowBooking(false);
+    setBookingDone(false);
+    setBookingForm(BOOKING_EMPTY);
     extractTattoo(f.simSrc).then(setProcessedSrc);
     if (imgRef.current && photo) runDetection(imgRef.current);
     else { setXf(INITIAL); setUserMoved(false); }
@@ -534,16 +562,161 @@ export default function Simulator() {
               {overlayVisible ? "Scroll → tamanho · Arraste → posição · Botões → rotação" : ""}
             </p>
 
-            <AnimatePresence>
-              {selected && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                  <a href={`#orcamento?flash=${encodeURIComponent(selected.name)}`}
+            <AnimatePresence mode="wait">
+              {selected && !showBooking && (
+                <motion.div key="cta" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>
+                  <button
+                    onClick={() => setShowBooking(true)}
                     className="btn-primary inline-flex items-center gap-3">
                     Quero essa tatuagem <ArrowRight size={13} />
-                  </a>
+                  </button>
                   <p className="mt-2.5 text-[9px] text-ink-faint">
                     Flash: <span className="text-ink">{selected.name}</span> · {selected.style}
                   </p>
+                </motion.div>
+              )}
+
+              {selected && showBooking && (
+                <motion.div
+                  key="booking"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="border border-paper-300 bg-paper-50"
+                >
+                  {bookingDone ? (
+                    /* ── Success state ── */
+                    <div className="p-8 flex flex-col items-center text-center gap-4">
+                      <CheckCircle size={28} className="text-ink" />
+                      <div>
+                        <p className="text-sm font-medium text-ink">WhatsApp aberto!</p>
+                        <p className="text-[10px] text-ink-muted mt-1 max-w-xs">A mensagem já está formatada com seus dados. Só enviar para o Bruno.</p>
+                      </div>
+                      <button
+                        onClick={() => { setShowBooking(false); setBookingDone(false); setBookingForm(BOOKING_EMPTY); }}
+                        className="text-[9px] tracking-widest uppercase text-ink-faint hover:text-ink transition-colors">
+                        Voltar ao simulador
+                      </button>
+                    </div>
+                  ) : (
+                    /* ── Booking form ── */
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        window.open(buildWhatsApp(selected, bookingForm), "_blank", "noopener");
+                        setBookingDone(true);
+                      }}
+                      className="p-5 space-y-5"
+                    >
+                      {/* Flash header */}
+                      <div className="flex items-center gap-3 pb-4 border-b border-paper-300">
+                        <div className="w-12 h-12 flex-shrink-0 border border-paper-200 bg-white flex items-center justify-center overflow-hidden">
+                          <img src={selected.src} alt={selected.name} className="w-10 h-10 object-contain" />
+                        </div>
+                        <div>
+                          <p className="text-[9px] tracking-widest uppercase text-ink-faint mb-0.5">Flash selecionado</p>
+                          <p className="text-sm text-ink font-medium">{selected.name}</p>
+                          <p className="text-[9px] text-ink-muted">{selected.style}</p>
+                        </div>
+                        <button type="button" onClick={() => setShowBooking(false)}
+                          className="ml-auto p-1.5 text-ink-faint hover:text-ink transition-colors">
+                          <X size={13} />
+                        </button>
+                      </div>
+
+                      {/* Local no corpo */}
+                      <div className="space-y-2.5">
+                        <label className="text-[9px] tracking-widest uppercase text-ink-muted block">
+                          Onde você quer fazer? <span className="text-red-400">*</span>
+                        </label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {PLACEMENTS.map((p) => (
+                            <button key={p} type="button"
+                              onClick={() => setBookingForm(f => ({ ...f, placement: p }))}
+                              className={cn(
+                                "text-[9px] tracking-wide px-2.5 py-1.5 border transition-all duration-150",
+                                bookingForm.placement === p
+                                  ? "border-ink bg-ink text-paper-100"
+                                  : "border-paper-300 text-ink-muted hover:border-paper-500"
+                              )}>
+                              {p}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Tamanho */}
+                      <div className="space-y-2.5">
+                        <label className="text-[9px] tracking-widest uppercase text-ink-muted block">Tamanho aproximado</label>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {SIZES.map((s) => (
+                            <button key={s} type="button"
+                              onClick={() => setBookingForm(f => ({ ...f, size: s }))}
+                              className={cn(
+                                "text-[9px] tracking-wide text-left px-2.5 py-2 border transition-all duration-150",
+                                bookingForm.size === s
+                                  ? "border-ink bg-ink text-paper-100"
+                                  : "border-paper-300 text-ink-muted hover:border-paper-500"
+                              )}>
+                              {s}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Nome */}
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] tracking-widest uppercase text-ink-muted block">
+                          Seu nome <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                          required
+                          type="text"
+                          value={bookingForm.name}
+                          onChange={(e) => setBookingForm(f => ({ ...f, name: e.target.value }))}
+                          placeholder="Como você se chama"
+                          className="w-full bg-transparent border-b border-paper-400 focus:border-ink outline-none text-sm text-ink py-1.5 placeholder-paper-400 transition-colors"
+                        />
+                      </div>
+
+                      {/* WhatsApp */}
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] tracking-widest uppercase text-ink-muted block">Seu WhatsApp</label>
+                        <input
+                          type="tel"
+                          value={bookingForm.phone}
+                          onChange={(e) => setBookingForm(f => ({ ...f, phone: e.target.value }))}
+                          placeholder="(48) 99999-9999"
+                          className="w-full bg-transparent border-b border-paper-400 focus:border-ink outline-none text-sm text-ink py-1.5 placeholder-paper-400 transition-colors"
+                        />
+                      </div>
+
+                      {/* Observações */}
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] tracking-widest uppercase text-ink-muted block">
+                          Alguma observação? <span className="normal-case tracking-normal text-paper-400">(opcional)</span>
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={bookingForm.notes}
+                          onChange={(e) => setBookingForm(f => ({ ...f, notes: e.target.value }))}
+                          placeholder="Adaptações, referências, dúvidas…"
+                          className="w-full bg-transparent border-b border-paper-400 focus:border-ink outline-none text-sm text-ink py-1.5 placeholder-paper-400 transition-colors resize-none"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={!bookingForm.name.trim() || !bookingForm.placement}
+                        className="btn-primary w-full justify-center gap-2.5 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <MessageCircle size={13} /> Enviar pelo WhatsApp
+                      </button>
+                      <p className="text-[9px] text-ink-faint text-center">
+                        O WhatsApp abre com sua mensagem formatada. Gratuito, sem compromisso.
+                      </p>
+                    </form>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
