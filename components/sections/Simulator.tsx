@@ -112,10 +112,15 @@ function extractTattoo(src: string): Promise<string> {
 
           if (t <= 0.004) { px[i + 3] = 0; continue; }
 
-          // Pure cool black — no warm tint — for maximum contrast on any skin tone.
-          // Shading gradients survive through the alpha channel.
-          px[i] = 8; px[i + 1] = 8; px[i + 2] = 10;
-          px[i + 3] = Math.round(t * a * 0.95);
+          // Keep original RGB so gradient shading translates naturally to skin.
+          // Light shading (grey) → subtle darkening via multiply.
+          // Solid ink (dark) → heavy darkening. This is how real tattoo ink looks.
+          // Only remove any colour cast — desaturate toward grey.
+          const avg = (px[i] + px[i + 1] + px[i + 2]) / 3;
+          px[i]     = Math.round(px[i]     * 0.15 + avg * 0.85);
+          px[i + 1] = Math.round(px[i + 1] * 0.15 + avg * 0.85);
+          px[i + 2] = Math.round(px[i + 2] * 0.15 + avg * 0.85);
+          px[i + 3] = Math.round(t * a * 0.97);
         }
         ctx.putImageData(id, 0, 0);
         resolve(cv.toDataURL("image/png"));
@@ -462,12 +467,12 @@ export default function Simulator() {
                         style={{
                           width: `${BASE_PX}px`,
                           height: "auto",
-                          // multiply lets the skin's real lighting modulate the
-                          // ink; the soft alpha edges from extractTattoo define
-                          // the silhouette, so NO vignette mask is needed.
+                          // multiply: dark ink darkens skin, white/transparent areas
+                          // let skin show through. Original grey tones preserved so
+                          // shading gradients translate naturally.
                           mixBlendMode: "multiply",
-                          filter: "blur(0.2px) contrast(1.25) brightness(0.82)",
-                          opacity: 0.96,
+                          filter: "blur(0.3px) contrast(1.1) brightness(0.80) saturate(0)",
+                          opacity: 0.93,
                         }}
                         draggable={false}
                       />
