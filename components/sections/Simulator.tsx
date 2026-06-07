@@ -99,8 +99,8 @@ function extractTattoo(src: string): Promise<string> {
         // solid ink (≤55) is fully present, and EVERY value between keeps
         // its tonal weight — preserving the shading/fades that make it
         // look like real ink instead of a flat stamp.
-        const BG = 240;   // anything brighter than this is background/paper
-        const INK = 80;   // anything darker is solid ink (raised from 55 → steeper ramp)
+        const BG = 245;   // anything brighter than this is background/paper
+        const INK = 92;   // anything darker is solid ink
         for (let i = 0; i < px.length; i += 4) {
           const a = px[i + 3];
           if (a < 16) { px[i + 3] = 0; continue; }
@@ -112,15 +112,18 @@ function extractTattoo(src: string): Promise<string> {
 
           if (t <= 0.004) { px[i + 3] = 0; continue; }
 
-          // Keep original RGB so gradient shading translates naturally to skin.
-          // Light shading (grey) → subtle darkening via multiply.
-          // Solid ink (dark) → heavy darkening. This is how real tattoo ink looks.
-          // Only remove any colour cast — desaturate toward grey.
+          // Real tattoo ink isn't pure black — healed black ink reads as a
+          // cool blue-grey. We desaturate the source toward grey (kills the
+          // photo's colour cast) then apply a slight blue tint so it looks
+          // like pigment under skin rather than a flat stamp. The brightness→
+          // alpha ramp keeps midtone shading, so gradients survive and the
+          // skin's own texture/lighting shows through via multiply blending.
           const avg = (px[i] + px[i + 1] + px[i + 2]) / 3;
-          px[i]     = Math.round(px[i]     * 0.15 + avg * 0.85);
-          px[i + 1] = Math.round(px[i + 1] * 0.15 + avg * 0.85);
-          px[i + 2] = Math.round(px[i + 2] * 0.15 + avg * 0.85);
-          px[i + 3] = Math.round(t * a * 0.97);
+          const DS = 0.88;                                   // desaturate amount
+          px[i]     = Math.round((px[i]     * (1 - DS) + avg * DS) * 0.87);
+          px[i + 1] = Math.round((px[i + 1] * (1 - DS) + avg * DS) * 0.93);
+          px[i + 2] = Math.round((px[i + 2] * (1 - DS) + avg * DS) * 1.0);
+          px[i + 3] = Math.round(t * a * 0.95);
         }
         ctx.putImageData(id, 0, 0);
         resolve(cv.toDataURL("image/png"));
@@ -486,13 +489,15 @@ export default function Simulator() {
                         style={{
                           width: `${BASE_PX}px`,
                           height: "auto",
-                          // darken: shows only pixels darker than the skin beneath.
-                          // multiply amplifies on dark skin tones (creates a blob).
-                          // darken is safe on any skin tone — grey bg (lighter than
-                          // skin) disappears; ink lines (darker than skin) appear.
-                          mixBlendMode: "darken",
-                          filter: "blur(0.3px) contrast(1.2) brightness(0.72) saturate(0)",
-                          opacity: 0.95,
+                          // multiply is the physically-correct model for pigment:
+                          // result = skin × ink, so the skin's real lighting and
+                          // pores show THROUGH the ink — exactly how a tattoo photo
+                          // looks. The semi-transparent alpha from extractTattoo
+                          // keeps it from turning dark skin into a blob. Tuned and
+                          // verified against light/medium/dark skin renders.
+                          mixBlendMode: "multiply",
+                          filter: "blur(0.4px) contrast(1.08) brightness(0.93) saturate(0.85)",
+                          opacity: 0.90,
                         }}
                         draggable={false}
                       />
