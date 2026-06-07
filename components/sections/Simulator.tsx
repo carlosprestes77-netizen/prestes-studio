@@ -97,24 +97,33 @@ function extractTattoo(src: string): Promise<string> {
         const id = ctx.getImageData(0, 0, w, h);
         const px = id.data;
 
+        // Brightness → ink-alpha ramp. White paper (≈245+) disappears,
+        // solid ink (≤55) is fully present, and EVERY value between keeps
+        // its tonal weight — preserving the shading/fades that make it
+        // look like real ink instead of a flat stamp.
+        const BG = 244;   // anything brighter than this is background
+        const INK = 55;   // anything darker than this is solid ink
         for (let i = 0; i < px.length; i += 4) {
-          const r = px[i], g = px[i + 1], b = px[i + 2], a = px[i + 3];
-          if (a < 20) { px[i + 3] = 0; continue; }
-          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-          if (lum > 230) {
-            // near-white → transparent (background / paper)
-            px[i + 3] = 0;
-          } else if (lum > 165) {
-            // light gray → partial transparency (light shading)
-            const t = (lum - 165) / 65;
-            px[i] = 22; px[i + 1] = 16; px[i + 2] = 12;
-            px[i + 3] = Math.round((1 - t * t) * a * 0.55);
-          } else {
-            // dark → tattoo ink (warm black)
-            const strength = Math.min(1.25, 1 - lum / 200);
-            px[i] = 20; px[i + 1] = 14; px[i + 2] = 10;
-            px[i + 3] = Math.min(255, Math.round(strength * a));
-          }
+          const a = px[i + 3];
+          if (a < 16) { px[i + 3] = 0; continue; }
+          const lum = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+
+          let t = (BG - lum) / (BG - INK);          // 0 = paper, 1 = solid ink
+          t = Math.max(0, Math.min(1, t));
+          t = t * t * (3 - 2 * t);                   // smoothstep → soft edges
+
+          if (t <= 0.001) { px[i + 3] = 0; continue; }
+
+          // Warm blue-black ink that still carries the original tone:
+          // darker source pixels stay darker, lighter shading stays lighter,
+          // so gradients and grey-wash survive instead of becoming flat.
+          const base = 14 + (1 - t) * 26;            // 14 (solid) … 40 (light fill)
+          px[i]     = Math.round(base * 1.18);       // a touch warm
+          px[i + 1] = Math.round(base * 1.02);
+          px[i + 2] = Math.round(base * 0.92);
+          // Cap below 1 so skin texture + highlights read through the ink,
+          // the way settled tattoo ink actually behaves under the camera.
+          px[i + 3] = Math.round(t * a * 0.9);
         }
         ctx.putImageData(id, 0, 0);
         resolve(cv.toDataURL("image/png"));
@@ -462,13 +471,12 @@ export default function Simulator() {
                         style={{
                           width: `${BASE_PX}px`,
                           height: "auto",
+                          // multiply lets the skin's real lighting modulate the
+                          // ink; the soft alpha edges from extractTattoo define
+                          // the silhouette, so NO vignette mask is needed.
                           mixBlendMode: "multiply",
-                          filter: "contrast(1.08) brightness(0.88) blur(0.35px) sepia(0.06)",
-                          opacity: 0.84,
-                          WebkitMaskImage:
-                            "radial-gradient(ellipse 92% 92% at 50% 50%, #000 52%, rgba(0,0,0,0.55) 78%, transparent 100%)",
-                          maskImage:
-                            "radial-gradient(ellipse 92% 92% at 50% 50%, #000 52%, rgba(0,0,0,0.55) 78%, transparent 100%)",
+                          filter: "blur(0.4px) contrast(1.04)",
+                          opacity: 0.92,
                         }}
                         draggable={false}
                       />
