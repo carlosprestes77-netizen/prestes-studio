@@ -31,56 +31,52 @@ function isSkin(r: number, g: number, b: number): boolean {
   return hue < 52 && sat > 0.09 && sat < 0.94;
 }
 
-/* ─── Place tattoo by detecting skin region ───────────────────── */
-function normToContainer(
-  nx: number, ny: number, scale: number,
-  img: HTMLImageElement, cW: number, cH: number,
-): TattooTransform {
-  const ia = img.naturalWidth / img.naturalHeight;
-  const ca = cW / cH;
-  let dW: number, dH: number, ox: number, oy: number;
-  if (ia > ca) { dH = cH; dW = cH * ia; ox = (dW - cW) / 2; oy = 0; }
-  else          { dW = cW; dH = cW / ia; ox = 0; oy = (dH - cH) / 2; }
-  return { x: nx * dW - ox - cW / 2, y: ny * dH - oy - cH / 2, scale, rotation: 0 };
-}
-
+/* ─── Detect skin density and size tattoo accordingly ────────────
+ *
+ *  WHY we no longer compute a centroid offset:
+ *  Phone JPEGs carry an EXIF orientation tag. The browser's <img> element
+ *  auto-rotates the display (so the user sees a portrait forearm). But
+ *  canvas.drawImage() ignores EXIF — it draws the raw pixel data, which
+ *  for a portrait phone shot is stored as landscape. Any centroid we compute
+ *  from that canvas is in the wrong coordinate space and maps to the wrong
+ *  position in the displayed (auto-rotated) image. Result: the tattoo lands
+ *  in the corner instead of the arm.
+ *
+ *  The fix: count skin pixels (no coordinates needed) to estimate coverage,
+ *  derive an appropriate scale, and ALWAYS place at centre. For a close-up
+ *  body-part photo the centre of the frame IS the body part. The user can
+ *  drag to fine-tune.
+ * ──────────────────────────────────────────────────────────────── */
 function detectAndPlace(img: HTMLImageElement, cW: number, cH: number): TattooTransform {
-  const S = 192;
+  const S = 128;
   const cv = document.createElement("canvas");
   cv.width = S; cv.height = S;
   const ctx = cv.getContext("2d")!;
   ctx.drawImage(img, 0, 0, S, S);
   const { data } = ctx.getImageData(0, 0, S, S);
 
-  let sx = 0, sy = 0, n = 0;
-  let x0 = S, x1 = 0, y0 = S, y1 = 0;
-
-  for (let y = 0; y < S; y++) {
-    for (let x = 0; x < S; x++) {
-      const i = (y * S + x) * 4;
-      if (isSkin(data[i], data[i + 1], data[i + 2])) {
-        sx += x; sy += y; n++;
-        if (x < x0) x0 = x; if (x > x1) x1 = x;
-        if (y < y0) y0 = y; if (y > y1) y1 = y;
-      }
-    }
+  let skinCount = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    if (isSkin(data[i], data[i + 1], data[i + 2])) skinCount++;
   }
 
-  // No skin pixels found → centre at a generous size (close-up shots where
-  // the whole frame is skin but tones fall outside the classifier).
-  if (n < 80) return { x: 0, y: 0, scale: (cW * 0.55) / BASE_PX, rotation: 0 };
+  // skinFrac: 0 = no skin (full-body / complex bg), 1 = skin fills entire frame
+  const skinFrac = skinCount / (S * S);
 
-  const nx = sx / n / S;
-  const ny = sy / n / S;
+  // Scale: close-up shot → fill most of the arm width.
+  //        Full-body / low-skin → use a smaller default.
+  //        Both cases center at (0, 0) — reliable regardless of EXIF.
+  const shortSide = Math.min(cW, cH);
+  const fillFactor = skinFrac > 0.35
+    ? 0.70                    // close-up: tattoo fills ~70% of short side
+    : skinFrac > 0.12
+      ? 0.55                  // partial body
+      : 0.42;                 // small skin area / full-body scene
 
-  // Size the tattoo to cover most of the detected limb. A real tattoo fills
-  // ~70% of a limb's width — sizing it to a third made it look like a tiny
-  // sticker lost on the arm. Cap to 80% of the container so it never overflows.
-  const regionW = ((x1 - x0) / S) * cW;   // skin-region width in px
-  const tgtPx = Math.max(150, Math.min(cW * 0.8, regionW * 0.72));
+  const tgtPx = Math.max(140, Math.min(cW * 0.84, shortSide * fillFactor));
   const scale = tgtPx / BASE_PX;
 
-  return normToContainer(nx, ny, scale, img, cW, cH);
+  return { x: 0, y: 0, scale, rotation: 0 };
 }
 
 /* ─── Process sim PNG → dark ink on transparent ──────────────── */
@@ -395,8 +391,8 @@ export default function Simulator() {
           <div className="space-y-3">
             <div
               ref={containerRef}
-              className="relative bg-paper-50 border border-paper-300 overflow-hidden select-none"
-              style={{ aspectRatio: "4/3", minHeight: "360px" }}
+              className="relative bg-paper-50 border border-paper-300 overflow-hidden select-none w-full max-h-[620px]"
+              style={{ aspectRatio: "4/3" }}
               onMouseMove={onMouseMove}
               onMouseUp={stopDrag}
               onMouseLeave={stopDrag}
