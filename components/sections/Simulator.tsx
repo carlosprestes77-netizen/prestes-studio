@@ -67,10 +67,10 @@ function detectAndPlace(img: HTMLImageElement, cW: number, cH: number): TattooTr
   // on both portrait and landscape photos. Larger factors = bolder result.
   const longSide = Math.max(cW, cH);
   const fillFactor = skinFrac > 0.30
-    ? 0.85                    // close-up: large tattoo covering most of the arm
+    ? 0.62                    // close-up: tattoo covers ~60% of visible area
     : skinFrac > 0.10
-      ? 0.68                  // partial body
-      : 0.52;                 // full-body scene
+      ? 0.50                  // partial body
+      : 0.40;                 // full-body scene
 
   const tgtPx = Math.max(160, Math.min(cW * 0.92, longSide * fillFactor));
   const scale = tgtPx / BASE_PX;
@@ -142,6 +142,7 @@ export default function Simulator() {
   const [dragging, setDragging] = useState(false);
   const draggingRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
+  const pinchRef = useRef<{ dist: number; scale: number } | null>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [page, setPage] = useState(0);
   const [detecting, setDetecting] = useState(false);
@@ -212,17 +213,35 @@ export default function Simulator() {
   }, []);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
-    const t = e.touches[0];
-    draggingRef.current = true;
-    dragStartRef.current = { x: t.clientX - xf.x, y: t.clientY - xf.y };
-    setDragging(true); setUserMoved(true);
-  }, [xf.x, xf.y]);
+    setUserMoved(true);
+    if (e.touches.length === 2) {
+      // Two-finger pinch — store initial distance and scale
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchRef.current = { dist: Math.hypot(dx, dy), scale: xf.scale };
+      draggingRef.current = false;
+    } else {
+      const t = e.touches[0];
+      draggingRef.current = true;
+      dragStartRef.current = { x: t.clientX - xf.x, y: t.clientY - xf.y };
+      pinchRef.current = null;
+    }
+    setDragging(true);
+  }, [xf.x, xf.y, xf.scale]);
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!draggingRef.current) return;
-    const t = e.touches[0];
-    const { x, y } = dragStartRef.current;
-    setXf(p => ({ ...p, x: t.clientX - x, y: t.clientY - y }));
+    if (e.touches.length === 2 && pinchRef.current) {
+      // Pinch-to-zoom
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      const newScale = Math.min(3, Math.max(0.3, pinchRef.current.scale * (dist / pinchRef.current.dist)));
+      setXf(p => ({ ...p, scale: newScale }));
+    } else if (draggingRef.current && e.touches.length === 1) {
+      const t = e.touches[0];
+      const { x, y } = dragStartRef.current;
+      setXf(p => ({ ...p, x: t.clientX - x, y: t.clientY - y }));
+    }
   }, []);
 
   const onWheel = useCallback((e: React.WheelEvent) => {
