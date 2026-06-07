@@ -467,12 +467,13 @@ export default function Simulator() {
                         style={{
                           width: `${BASE_PX}px`,
                           height: "auto",
-                          // multiply: dark ink darkens skin, white/transparent areas
-                          // let skin show through. Original grey tones preserved so
-                          // shading gradients translate naturally.
-                          mixBlendMode: "multiply",
-                          filter: "blur(0.3px) contrast(1.1) brightness(0.80) saturate(0)",
-                          opacity: 0.93,
+                          // darken: shows only pixels darker than the skin beneath.
+                          // multiply amplifies on dark skin tones (creates a blob).
+                          // darken is safe on any skin tone — grey bg (lighter than
+                          // skin) disappears; ink lines (darker than skin) appear.
+                          mixBlendMode: "darken",
+                          filter: "blur(0.3px) contrast(1.2) brightness(0.72) saturate(0)",
+                          opacity: 0.95,
                         }}
                         draggable={false}
                       />
