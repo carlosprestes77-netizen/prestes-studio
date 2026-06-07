@@ -66,15 +66,18 @@ function detectAndPlace(img: HTMLImageElement, cW: number, cH: number): TattooTr
     }
   }
 
-  // No skin pixels found → place at image centre (correct for close-up shots)
-  if (n < 80) return INITIAL;
+  // No skin pixels found → centre at a generous size (close-up shots where
+  // the whole frame is skin but tones fall outside the classifier).
+  if (n < 80) return { x: 0, y: 0, scale: (cW * 0.55) / BASE_PX, rotation: 0 };
 
   const nx = sx / n / S;
   const ny = sy / n / S;
 
-  // Scale tattoo so it covers ~35% of the detected skin region width
-  const skinW = (x1 - x0) / S;
-  const tgtPx = Math.max(100, Math.min(340, skinW * cW * 0.35));
+  // Size the tattoo to cover most of the detected limb. A real tattoo fills
+  // ~70% of a limb's width — sizing it to a third made it look like a tiny
+  // sticker lost on the arm. Cap to 80% of the container so it never overflows.
+  const regionW = ((x1 - x0) / S) * cW;   // skin-region width in px
+  const tgtPx = Math.max(150, Math.min(cW * 0.8, regionW * 0.72));
   const scale = tgtPx / BASE_PX;
 
   return normToContainer(nx, ny, scale, img, cW, cH);
