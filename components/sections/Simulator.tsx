@@ -63,17 +63,16 @@ function detectAndPlace(img: HTMLImageElement, cW: number, cH: number): TattooTr
   // skinFrac: 0 = no skin (full-body / complex bg), 1 = skin fills entire frame
   const skinFrac = skinCount / (S * S);
 
-  // Scale: close-up shot → fill most of the arm width.
-  //        Full-body / low-skin → use a smaller default.
-  //        Both cases center at (0, 0) — reliable regardless of EXIF.
-  const shortSide = Math.min(cW, cH);
-  const fillFactor = skinFrac > 0.35
-    ? 0.70                    // close-up: tattoo fills ~70% of short side
-    : skinFrac > 0.12
-      ? 0.55                  // partial body
-      : 0.42;                 // small skin area / full-body scene
+  // Scale: use the LONGER side of the container so the tattoo fills the arm
+  // on both portrait and landscape photos. Larger factors = bolder result.
+  const longSide = Math.max(cW, cH);
+  const fillFactor = skinFrac > 0.30
+    ? 0.85                    // close-up: large tattoo covering most of the arm
+    : skinFrac > 0.10
+      ? 0.68                  // partial body
+      : 0.52;                 // full-body scene
 
-  const tgtPx = Math.max(140, Math.min(cW * 0.84, shortSide * fillFactor));
+  const tgtPx = Math.max(160, Math.min(cW * 0.92, longSide * fillFactor));
   const scale = tgtPx / BASE_PX;
 
   return { x: 0, y: 0, scale, rotation: 0 };
@@ -100,29 +99,23 @@ function extractTattoo(src: string): Promise<string> {
         // solid ink (≤55) is fully present, and EVERY value between keeps
         // its tonal weight — preserving the shading/fades that make it
         // look like real ink instead of a flat stamp.
-        const BG = 244;   // anything brighter than this is background
-        const INK = 55;   // anything darker than this is solid ink
+        const BG = 240;   // anything brighter than this is background/paper
+        const INK = 80;   // anything darker is solid ink (raised from 55 → steeper ramp)
         for (let i = 0; i < px.length; i += 4) {
           const a = px[i + 3];
           if (a < 16) { px[i + 3] = 0; continue; }
           const lum = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
 
-          let t = (BG - lum) / (BG - INK);          // 0 = paper, 1 = solid ink
+          let t = (BG - lum) / (BG - INK);
           t = Math.max(0, Math.min(1, t));
-          t = t * t * (3 - 2 * t);                   // smoothstep → soft edges
+          t = t * t * (3 - 2 * t);                   // smoothstep
 
-          if (t <= 0.001) { px[i + 3] = 0; continue; }
+          if (t <= 0.004) { px[i + 3] = 0; continue; }
 
-          // Warm blue-black ink that still carries the original tone:
-          // darker source pixels stay darker, lighter shading stays lighter,
-          // so gradients and grey-wash survive instead of becoming flat.
-          const base = 14 + (1 - t) * 26;            // 14 (solid) … 40 (light fill)
-          px[i]     = Math.round(base * 1.18);       // a touch warm
-          px[i + 1] = Math.round(base * 1.02);
-          px[i + 2] = Math.round(base * 0.92);
-          // Cap below 1 so skin texture + highlights read through the ink,
-          // the way settled tattoo ink actually behaves under the camera.
-          px[i + 3] = Math.round(t * a * 0.9);
+          // Pure cool black — no warm tint — for maximum contrast on any skin tone.
+          // Shading gradients survive through the alpha channel.
+          px[i] = 8; px[i + 1] = 8; px[i + 2] = 10;
+          px[i + 3] = Math.round(t * a * 0.95);
         }
         ctx.putImageData(id, 0, 0);
         resolve(cv.toDataURL("image/png"));
@@ -391,8 +384,7 @@ export default function Simulator() {
           <div className="space-y-3">
             <div
               ref={containerRef}
-              className="relative bg-paper-50 border border-paper-300 overflow-hidden select-none w-full max-h-[620px]"
-              style={{ aspectRatio: "4/3" }}
+              className="relative bg-paper-50 border border-paper-300 overflow-hidden select-none w-full aspect-square lg:aspect-[4/3] max-h-[600px]"
               onMouseMove={onMouseMove}
               onMouseUp={stopDrag}
               onMouseLeave={stopDrag}
@@ -474,8 +466,8 @@ export default function Simulator() {
                           // ink; the soft alpha edges from extractTattoo define
                           // the silhouette, so NO vignette mask is needed.
                           mixBlendMode: "multiply",
-                          filter: "blur(0.4px) contrast(1.04)",
-                          opacity: 0.92,
+                          filter: "blur(0.2px) contrast(1.25) brightness(0.82)",
+                          opacity: 0.96,
                         }}
                         draggable={false}
                       />
